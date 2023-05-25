@@ -3,6 +3,7 @@
 #include "motor.h"
 #include "wifi_com.h"
 #include "non_blocking_delay.h"
+#include "pc_serial_com.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -27,8 +28,10 @@ static nonBlockingDelay_t mainSystemDelay;
 
 void mainSystemInit()
 {
-   tickerInit();
+
+   pcSerialComInit();
    motorControlInit();
+   dateAndTimeInit();
 
    nonBlockingDelayInit( &mainSystemDelay, SYSTEM_TIME_INCREMENT_MS );
 
@@ -39,8 +42,8 @@ void mainSystemUpdate()
    
 
     if( nonBlockingDelayRead(&mainSystemDelay) ) {
-    
-         motorControlUpdate();
+        pcSerialComUpdate();
+        motorControlUpdate();
     }
     wifiComUpdate(); 
 }

@@ -7,7 +7,6 @@
 
 
 #include "date_and_time.h"
-#include "temperature_sensor.h"
 #include "gas_sensor.h"
 #include "event_log.h"
 #include "motor.h"
@@ -334,12 +333,16 @@ static void commandShowCurrentMotorState()
 
 static void commandShowCurrentMotorsState()
 {
-    switch ( gateStatusRead() ) {
+
+for(int i = 0; i < NUMBER_OF_MOTORS;i++ ){
+    switch ( motorDirectionRead(i) ) {
         case GATE_CLOSED: pcSerialComStringWrite( "The gate is closed\r\n"); break;
         case GATE_OPEN: pcSerialComStringWrite( "The gate is open\r\n"); break;
         case GATE_OPENING: pcSerialComStringWrite( "The gate is opening\r\n"); break;
         case GATE_CLOSING: pcSerialComStringWrite( "The gate is closing\r\n"); break;
     }
+}
+    
 }
 
 

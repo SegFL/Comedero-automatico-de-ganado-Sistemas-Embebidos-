@@ -3,9 +3,6 @@
 #ifndef _WIFI_COM_
 #define _WIFI_COM_
 
-
-#include "wifi_com.h"
-
 //=====[Declarations (prototypes) of public functions]=========================
 
 void wifiComRestart();
