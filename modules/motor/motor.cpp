@@ -12,22 +12,67 @@
 
 //=====[Declaration of private data types]=====================================
 
+class motor {
+public:
+  motorDirection_t motorDirection;
+  motorDirection_t motorState;
+  DigitalInOut motorPin1;
+  DigitalInOut motorPin2;
+
+  // Constructor
+  motor(PinName pin1, PinName pin2)
+      : motorDirection(STOPPED), motorState(STOPPED), motorPin1(PF_2),
+        motorPin2(PE_3) {
+
+    // Configurar los pines
+
+    motorDirection = STOPPED;
+    motorState = STOPPED;
+
+    DigitalInOut motorPin1(pin1);
+    DigitalInOut motorPin2(pin2);
+
+    motorPin1.mode(OpenDrain);
+    motorPin2.mode(OpenDrain);
+
+    motorPin1.input();
+    motorPin2.input();
+  }
+  motorDirection_t read() { return motorDirection; }
+  void write(motorDirection_t d) { motorDirection = d; }
+
+  motorDirection_t read_state() { return motorState; }
+  void change_state(motorDirection_t state) {
+
+    if (state == STOPPED) {
+      motorPin1.input();
+      motorPin2.input();
+      motorState = state;
+    }
+
+    if (motorDirection == DIRECTION_1) {
+      motorPin2.input();
+      motorPin1.output();
+      motorPin1 = LOW;
+      motorState = DIRECTION_1;
+    }
+
+    if (motorDirection == DIRECTION_2) {
+      motorPin1.input();
+      motorPin2.output();
+      motorPin2 = LOW;
+      motorState = DIRECTION_2;
+    }
+  }
+};
+
 //=====[Declaration and initialization of public global objects]===============
 
-DigitalInOut motorM1Pin1(PF_2);
-DigitalInOut motorM1Pin2(PE_3);
-
-DigitalInOut motorM2Pin1();
-DigitalInOut motorM2Pin2();
-
-
+motor motorArray[] = {motor(PF_2, PE_3), motor(PH_0, PH_1)};
 
 //=====[Declaration of external public global variables]=======================
 
 //=====[Declaration and initialization of public global variables]=============
-
-motorDirection_t motorDirection;
-motorDirection_t motorState;
 
 //=====[Declaration and initialization of private global variables]============
 
@@ -35,77 +80,57 @@ motorDirection_t motorState;
 
 //=====[Implementations of public functions]===================================
 
-void motorControlInit()
-{
-    motorM1Pin1.mode(OpenDrain);
-    motorM1Pin2.mode(OpenDrain);
-    
-    motorM1Pin1.input();
-    motorM1Pin2.input();
+void motorControlInit() {}
 
-
-
-    motorDirection = STOPPED;
-    motorState = STOPPED;
+motorDirection_t motorDirectionRead(int n_motor) {
+  return motorArray[n_motor].read();
 }
 
-motorDirection_t motorDirectionRead()
-{
-    return motorDirection;
+void motorDirectionWrite(int n_motor, motorDirection_t direction) {
+
+  motorArray[n_motor].write(direction);
 }
 
-void motorDirectionWrite( motorDirection_t direction )
-{
-    motorDirection = direction;
-}
+void motorControlUpdate() {
+  // Ambos motores tienen el mismo counter lo que singifica que ambos se
+  // actualizan en el mismo ciclo.
+  static int motorUpdateCounter = 0;
 
-void motorControlUpdate()
-{
-    static int motorUpdateCounter = 0;
-    
-    motorUpdateCounter++;
-    
-    if ( motorUpdateCounter > MOTOR_UPDATE_TIME ) {
-        
-        motorUpdateCounter = 0;
-        
-        switch ( motorState ) {
-            case DIRECTION_1:
-                if ( motorDirection == DIRECTION_2 || 
-                     motorDirection == STOPPED ) {
-                    motorM1Pin1.input();
-                    motorM1Pin2.input();
-                    motorState = STOPPED;
-                }
-            break;
-    
-            case DIRECTION_2:
-                if ( motorDirection == DIRECTION_1 || 
-                     motorDirection == STOPPED ) {
-                    motorM1Pin1.input();
-                    motorM1Pin2.input();
-                    motorState = STOPPED;
-                }
-            break;
-    
-            case STOPPED:
-            default:
-                if ( motorDirection == DIRECTION_1 ) {
-                    motorM1Pin2.input();
-                    motorM1Pin1.output();
-                    motorM1Pin1 = LOW;
-                    motorState = DIRECTION_1;
-                }
-                
-                if ( motorDirection == DIRECTION_2 ) {
-                    motorM1Pin1.input();
-                    motorM1Pin2.output();
-                    motorM1Pin2 = LOW;
-                    motorState = DIRECTION_2;
-                }
-            break;
+  motorUpdateCounter++;
+
+  if (motorUpdateCounter > MOTOR_UPDATE_TIME) {
+
+    motorUpdateCounter = 0;
+    for (int i = 0; i < 2; i++) {
+
+      switch (motorArray[i].read_state()) {
+      case DIRECTION_1:
+        if (motorArray[i].read() == DIRECTION_2 ||
+            motorArray[i].read() == STOPPED) {
+
+          motorArray[i].change_state(STOPPED);
         }
-    }        
+        break;
+
+      case DIRECTION_2:
+        if (motorArray[i].read() == DIRECTION_1 ||
+            motorArray[i].read() == STOPPED) {
+
+          motorArray[i].change_state(STOPPED);
+        }
+        break;
+
+      case STOPPED:
+      default:
+        if (motorArray[i].read() == DIRECTION_1) {
+          motorArray[i].change_state(DIRECTION_1);
+        }else if (motorArray[i].read() == DIRECTION_2) {
+         motorArray[i].change_state(DIRECTION_2);
+        }
+        break;
+      }
+    }
+  }
 }
 
 //=====[Implementations of private functions]==================================
