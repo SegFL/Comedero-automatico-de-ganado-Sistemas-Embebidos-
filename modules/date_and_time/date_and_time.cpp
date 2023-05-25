@@ -1,19 +1,14 @@
 //=====[Libraries]=============================================================
 
-#include "motor.h"
-#include "wifi_com.h"
-#include "non_blocking_delay.h"
+#include "mbed.h"
+
+#include "date_and_time.h"
 
 //=====[Declaration of private defines]========================================
-
-
-#define SYSTEM_TIME_INCREMENT_MS 10
 
 //=====[Declaration of private data types]=====================================
 
 //=====[Declaration and initialization of public global objects]===============
-
-static nonBlockingDelay_t mainSystemDelay;
 
 //=====[Declaration of external public global variables]=======================
 
@@ -25,24 +20,29 @@ static nonBlockingDelay_t mainSystemDelay;
 
 //=====[Implementations of public functions]===================================
 
-void mainSystemInit()
+char* dateAndTimeRead()
 {
-   tickerInit();
-   motorControlInit();
-
-   nonBlockingDelayInit( &mainSystemDelay, SYSTEM_TIME_INCREMENT_MS );
-
+    time_t epochSeconds;
+    epochSeconds = time(NULL);
+    return ctime(&epochSeconds);    
 }
 
-void mainSystemUpdate()
+void dateAndTimeWrite( int year, int month, int day, 
+                       int hour, int minute, int second )
 {
-   
+    struct tm rtcTime;
 
-    if( nonBlockingDelayRead(&mainSystemDelay) ) {
-    
-         motorControlUpdate();
-    }
-    wifiComUpdate(); 
+    rtcTime.tm_year = year - 1900;
+    rtcTime.tm_mon  = month - 1;
+    rtcTime.tm_mday = day;
+    rtcTime.tm_hour = hour;
+    rtcTime.tm_min  = minute;
+    rtcTime.tm_sec  = second;
+
+    rtcTime.tm_isdst = -1;
+
+    set_time( mktime( &rtcTime ) );
 }
 
 //=====[Implementations of private functions]==================================
+

@@ -14,8 +14,11 @@
 
 //=====[Declaration and initialization of public global objects]===============
 
-DigitalInOut motorM1Pin(PF_2);
-DigitalInOut motorM2Pin(PE_3);
+DigitalInOut motorM1Pin1(PF_2);
+DigitalInOut motorM1Pin2(PE_3);
+
+DigitalInOut motorM2Pin1();
+DigitalInOut motorM2Pin2();
 
 
 
@@ -34,11 +37,11 @@ motorDirection_t motorState;
 
 void motorControlInit()
 {
-    motorM1Pin.mode(OpenDrain);
-    motorM2Pin.mode(OpenDrain);
+    motorM1Pin1.mode(OpenDrain);
+    motorM1Pin2.mode(OpenDrain);
     
-    motorM1Pin.input();
-    motorM2Pin.input();
+    motorM1Pin1.input();
+    motorM1Pin2.input();
 
 
 
@@ -70,8 +73,8 @@ void motorControlUpdate()
             case DIRECTION_1:
                 if ( motorDirection == DIRECTION_2 || 
                      motorDirection == STOPPED ) {
-                    motorM1Pin.input();
-                    motorM2Pin.input();
+                    motorM1Pin1.input();
+                    motorM1Pin2.input();
                     motorState = STOPPED;
                 }
             break;
@@ -79,8 +82,8 @@ void motorControlUpdate()
             case DIRECTION_2:
                 if ( motorDirection == DIRECTION_1 || 
                      motorDirection == STOPPED ) {
-                    motorM1Pin.input();
-                    motorM2Pin.input();
+                    motorM1Pin1.input();
+                    motorM1Pin2.input();
                     motorState = STOPPED;
                 }
             break;
@@ -88,16 +91,16 @@ void motorControlUpdate()
             case STOPPED:
             default:
                 if ( motorDirection == DIRECTION_1 ) {
-                    motorM2Pin.input();
-                    motorM1Pin.output();
-                    motorM1Pin = LOW;
+                    motorM1Pin2.input();
+                    motorM1Pin1.output();
+                    motorM1Pin1 = LOW;
                     motorState = DIRECTION_1;
                 }
                 
                 if ( motorDirection == DIRECTION_2 ) {
-                    motorM1Pin.input();
-                    motorM2Pin.output();
-                    motorM2Pin = LOW;
+                    motorM1Pin1.input();
+                    motorM1Pin2.output();
+                    motorM1Pin2 = LOW;
                     motorState = DIRECTION_2;
                 }
             break;
