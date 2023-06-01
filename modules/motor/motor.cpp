@@ -12,13 +12,11 @@
 
 //=====[Declaration of private data types]=====================================
 
-class motor {
-public:
-  motorDirection_t motorDirection;
-  motorDirection_t motorState;
-  DigitalInOut motorPin1;
-  DigitalInOut motorPin2;
 
+
+//=====[Declaration and initialization of public global objects]===============
+class motor{
+    public:
   // Constructor
   motor(PinName pin1, PinName pin2)
       : motorDirection(STOPPED), motorState(STOPPED), motorPin1(PF_2),
@@ -40,6 +38,8 @@ public:
   }
   motorDirection_t read() { return motorDirection; }
   void write(motorDirection_t d) { motorDirection = d; }
+
+private:
 
   motorDirection_t read_state() { return motorState; }
   void change_state(motorDirection_t state) {
@@ -66,10 +66,6 @@ public:
   }
 };
 
-//=====[Declaration and initialization of public global objects]===============
-
-motor motorArray[] = {motor(PF_2, PE_3), motor(PH_0, PH_1)};
-
 //=====[Declaration of external public global variables]=======================
 
 //=====[Declaration and initialization of public global variables]=============
@@ -79,58 +75,5 @@ motor motorArray[] = {motor(PF_2, PE_3), motor(PH_0, PH_1)};
 //=====[Declarations (prototypes) of private functions]========================
 
 //=====[Implementations of public functions]===================================
-
-void motorControlInit() {}
-
-motorDirection_t motorDirectionRead(int n_motor) {
-  return motorArray[n_motor].read();
-}
-
-void motorDirectionWrite(int n_motor, motorDirection_t direction) {
-
-  motorArray[n_motor].write(direction);
-}
-
-void motorControlUpdate() {
-  // Ambos motores tienen el mismo counter lo que singifica que ambos se
-  // actualizan en el mismo ciclo.
-  static int motorUpdateCounter = 0;
-
-  motorUpdateCounter++;
-
-  if (motorUpdateCounter > MOTOR_UPDATE_TIME) {
-
-    motorUpdateCounter = 0;
-    for (int i = 0; i < 2; i++) {
-
-      switch (motorArray[i].read_state()) {
-      case DIRECTION_1:
-        if (motorArray[i].read() == DIRECTION_2 ||
-            motorArray[i].read() == STOPPED) {
-
-          motorArray[i].change_state(STOPPED);
-        }
-        break;
-
-      case DIRECTION_2:
-        if (motorArray[i].read() == DIRECTION_1 ||
-            motorArray[i].read() == STOPPED) {
-
-          motorArray[i].change_state(STOPPED);
-        }
-        break;
-
-      case STOPPED:
-      default:
-        if (motorArray[i].read() == DIRECTION_1) {
-          motorArray[i].change_state(DIRECTION_1);
-        }else if (motorArray[i].read() == DIRECTION_2) {
-         motorArray[i].change_state(DIRECTION_2);
-        }
-        break;
-      }
-    }
-  }
-}
 
 //=====[Implementations of private functions]==================================

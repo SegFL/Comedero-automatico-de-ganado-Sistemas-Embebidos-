@@ -15,6 +15,11 @@
 InterruptIn gateOpenLimitSwitch(PG_1);
 InterruptIn gateCloseLimitSwitch(PF_7);
 
+motor motor1(PF_2, PE_3);
+motor motor2(PH_0, PH_1);
+
+motor motorArray[] = {motor(PF_2, PE_3), motor(PH_0, PH_1)};
+
 //=====[Declaration of external public global variables]=======================
 
 //=====[Declaration and initialization of public global variables]=============
@@ -24,67 +29,51 @@ InterruptIn gateCloseLimitSwitch(PF_7);
 static bool gateOpenLimitSwitchState;
 static bool gateCloseLimitSwitchState;
 
-static gateStatus_t gateStatus;
+static feederStatus_t gateStatus;
 
 //=====[Declarations (prototypes) of private functions]========================
 
-static void gateOpenLimitSwitchCallback();
-static void gateCloseLimitSwitchCallback();
 
 //=====[Implementations of public functions]===================================
 
-void gateInit()
-{
-    gateOpenLimitSwitch.mode(PullUp);
-    gateCloseLimitSwitch.mode(PullUp);
+void feederUpdate() {
+  // Ambos motores tienen el mismo counter lo que singifica que ambos se
+  // actualizan en el mismo ciclo.
+  static int feederUpdateCounter = 0;
 
-    gateOpenLimitSwitch.fall(&gateOpenLimitSwitchCallback);
-    gateCloseLimitSwitch.fall(&gateCloseLimitSwitchCallback);
+  feederUpdateCounter++;
 
-    gateOpenLimitSwitchState = OFF;
-    gateCloseLimitSwitchState = ON;
-    gateStatus = GATE_CLOSED;
-}
+  if (feederUpdateCounter > MOTOR_UPDATE_TIME) {
 
-void gateOpen()
-{
-    if ( !gateOpenLimitSwitchState ) {
-        motorDirectionWrite( DIRECTION_1 );
-        gateStatus = GATE_OPENING;
-        gateCloseLimitSwitchState = OFF;
+    feederUpdateCounter = 0;
+    for (int i = 0; i < 2; i++) {
+
+      switch (motorArray[i].read_state()) {
+      case DIRECTION_1:
+        if (motorArray[i].read() == DIRECTION_2 ||
+            motorArray[i].read() == STOPPED) {
+
+          motorArray[i].change_state(STOPPED);
+        }
+        break;
+
+      case DIRECTION_2:
+        if (motorArray[i].read() == DIRECTION_1 ||
+            motorArray[i].read() == STOPPED) {
+
+          motorArray[i].change_state(STOPPED);
+        }
+        break;
+
+      case STOPPED:
+      default:
+        if (motorArray[i].read() == DIRECTION_1) {
+          motorArray[i].change_state(DIRECTION_1);
+        }else if (motorArray[i].read() == DIRECTION_2) {
+         motorArray[i].change_state(DIRECTION_2);
+        }
+        break;
+      }
     }
-}
-
-void gateClose()
-{
-    if ( !gateCloseLimitSwitchState ) {
-        motorDirectionWrite( DIRECTION_2 );
-        gateStatus = GATE_CLOSING;
-        gateOpenLimitSwitchState = OFF;
-    }
-}
-
-gateStatus_t gateStatusRead()
-{
-    return gateStatus;
-}
-
-//=====[Implementations of private functions]==================================
-
-static void gateOpenLimitSwitchCallback()
-{
-    if ( motorDirectionRead() == DIRECTION_1 ) {
-        motorDirectionWrite(STOPPED);
-        gateStatus = GATE_OPEN;
-        gateOpenLimitSwitchState = ON;
-    }
-}
-
-static void gateCloseLimitSwitchCallback()
-{
-    if ( motorDirectionRead() == DIRECTION_2 ) {
-        motorDirectionWrite(STOPPED);
-        gateStatus = GATE_CLOSED;
-        gateCloseLimitSwitchState = ON;
-    }
+  }
 }

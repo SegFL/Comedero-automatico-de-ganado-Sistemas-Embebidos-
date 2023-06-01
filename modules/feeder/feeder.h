@@ -1,28 +1,27 @@
 //=====[#include guards - begin]===============================================
 
-#ifndef _GATE_H_
-#define _GATE_H_
+#ifndef _FEEDER_H_
+#define _FEEDER_H_
 
 //=====[Declaration of public defines]=========================================
 
 //=====[Declaration of public data types]======================================
 
 typedef enum {
-    GATE_CLOSED,
-    GATE_OPEN,
-    GATE_OPENING,
-    GATE_CLOSING,
-} gateStatus_t;
+    FEEDER_CLOSED,
+    FEEDER_OPEN,
+    FEEDER_OPENING,
+    FEEDER_CLOSING,
+} feederStatus_t;
 
 //=====[Declarations (prototypes) of public functions]=========================
 
-void gateInit();
+void feederInit();
+void feederUpdate()
 
-void gateOpen();
-void gateClose();
 
-gateStatus_t gateStatusRead();
+feederStatus_t feederStatusRead();
 
 //=====[#include guards - end]=================================================
 
-#endif // _GATE_H_
+#endif // _FEEDER_H_

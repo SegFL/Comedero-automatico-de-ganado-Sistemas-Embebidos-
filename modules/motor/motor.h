@@ -3,6 +3,7 @@
 #ifndef _MOTOR_H_
 #define _MOTOR_H_
 
+#include "mbed.h"
 //=====[Declaration of public defines]=========================================
 
 //=====[Declaration of public data types]======================================
@@ -13,14 +14,21 @@ typedef enum {
     STOPPED
 } motorDirection_t;
 
+class motor{
+     public:
+     motorDirection_t motorDirection;
+    motorDirection_t motorState;
+     DigitalInOut motorPin1;
+     DigitalInOut motorPin2;
+     
+     motor(PinName pin1, PinName pin2);
+    motorDirection_t read();
+    void write(motorDirection_t d);
+
+ };
+
+
 //=====[Declarations (prototypes) of public functions]=========================
-
-void motorControlInit();
-void motorDirectionWrite( motorDirection_t direction );
-
-motorDirection_t motorDirectionRead();
-
-void motorControlUpdate();
 
 //=====[#include guards - end]=================================================
 
