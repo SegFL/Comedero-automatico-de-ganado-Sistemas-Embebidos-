@@ -4,7 +4,7 @@
 #define _FEEDER_H_
 
 //=====[Declaration of public defines]=========================================
-
+#define MOTOR_UPDATE_TIME 10
 //=====[Declaration of public data types]======================================
 
 typedef enum {
@@ -17,7 +17,7 @@ typedef enum {
 //=====[Declarations (prototypes) of public functions]=========================
 
 void feederInit();
-void feederUpdate()
+void feederUpdate();
 
 
 feederStatus_t feederStatusRead();

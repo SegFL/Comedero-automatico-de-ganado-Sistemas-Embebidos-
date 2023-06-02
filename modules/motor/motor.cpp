@@ -8,17 +8,15 @@
 
 //=====[Declaration of private defines]========================================
 
-#define MOTOR_UPDATE_TIME 9
 
 //=====[Declaration of private data types]=====================================
 
 
 
 //=====[Declaration and initialization of public global objects]===============
-class motor{
-    public:
-  // Constructor
-  motor(PinName pin1, PinName pin2)
+
+
+motor::motor(PinName pin1, PinName pin2)
       : motorDirection(STOPPED), motorState(STOPPED), motorPin1(PF_2),
         motorPin2(PE_3) {
 
@@ -36,13 +34,14 @@ class motor{
     motorPin1.input();
     motorPin2.input();
   }
-  motorDirection_t read() { return motorDirection; }
-  void write(motorDirection_t d) { motorDirection = d; }
 
-private:
+motorDirection_t motor::read() { return motorDirection; }
 
-  motorDirection_t read_state() { return motorState; }
-  void change_state(motorDirection_t state) {
+void motor::write(motorDirection_t d) { motorDirection = d; }
+
+motorDirection_t motor::read_state() { return motorState; }
+
+void motor::change_state(motorDirection_t state) {
 
     if (state == STOPPED) {
       motorPin1.input();
@@ -63,8 +62,8 @@ private:
       motorPin2 = LOW;
       motorState = DIRECTION_2;
     }
-  }
-};
+}
+
 
 //=====[Declaration of external public global variables]=======================
 

@@ -15,8 +15,6 @@
 InterruptIn gateOpenLimitSwitch(PG_1);
 InterruptIn gateCloseLimitSwitch(PF_7);
 
-motor motor1(PF_2, PE_3);
-motor motor2(PH_0, PH_1);
 
 motor motorArray[] = {motor(PF_2, PE_3), motor(PH_0, PH_1)};
 
