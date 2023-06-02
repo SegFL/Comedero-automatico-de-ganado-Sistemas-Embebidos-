@@ -6,6 +6,7 @@
 #include "Statechart.h"
 #include "sc_timer_service.h"
 #include "sc_types.h"
+#include "matrix_keypad.h"
 
 using namespace std;
 using namespace sc::timer;
@@ -43,6 +44,7 @@ void smTick(void)
  
 int main()
 {
+    char buttonStatus;
 	/*! Sets the timer service */
 	sm->setTimerService( timerService );
 
@@ -55,13 +57,27 @@ int main()
     while (true) {
 
 		/* Checking the waited Flag */
-        if (smTickFlag == true) {
+         if (smTickFlag == true) {
 			/* Then reset its Flag */
             smTickFlag = false;
-            
+
 			/* Then Update all Time Events (smTickRate 1 mili second),
              * and then Run an Cycle of state machine */
-			timerService->proceed( 1 );
+            timerService->proceed( 1 );
+            
+            /* Then Get status of buttons */
+            buttonStatus = matrixKeypadScan();
+
+            /* Then if there are a pressed button */
+            if (buttonStatus != OFF)
+            	/* Then Raise an Event -> eEvButtonPressed => OK,
+				 * Value of pressed button -> buttonStatus,
+                 * and then Run an Cycle of state machine */
+                sm->raiseEvButtonPressed(buttonStatus);
+            else
+            	/* Then else Raise an Event -> evButtonUnpressed => OK,
+                 * and then Run an Cycle of state machine */
+                sm->raiseEvButtonUnpressed();
         }
     }
 }
