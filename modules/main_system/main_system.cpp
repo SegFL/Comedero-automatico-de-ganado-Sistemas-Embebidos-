@@ -1,9 +1,7 @@
 //=====[Libraries]=============================================================
 
 #include "motor.h"
-#include "wifi_com.h"
-#include "non_blocking_delay.h"
-#include "pc_serial_com.h"
+//#include "pc_serial_com.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -14,7 +12,7 @@
 
 //=====[Declaration and initialization of public global objects]===============
 
-static nonBlockingDelay_t mainSystemDelay;
+
 
 //=====[Declaration of external public global variables]=======================
 
@@ -29,11 +27,8 @@ static nonBlockingDelay_t mainSystemDelay;
 void mainSystemInit()
 {
 
-   pcSerialComInit();
-   motorControlInit();
-   dateAndTimeInit();
-
-   nonBlockingDelayInit( &mainSystemDelay, SYSTEM_TIME_INCREMENT_MS );
+  // pcSerialComInit();
+  // nonBlockingDelayInit( &mainSystemDelay, SYSTEM_TIME_INCREMENT_MS );
 
 }
 
@@ -41,11 +36,10 @@ void mainSystemUpdate()
 {
    
 
-    if( nonBlockingDelayRead(&mainSystemDelay) ) {
-        pcSerialComUpdate();
-        motorControlUpdate();
-    }
-    wifiComUpdate(); 
+
+       // pcSerialComUpdate();
+
+
 }
 
 //=====[Implementations of private functions]==================================

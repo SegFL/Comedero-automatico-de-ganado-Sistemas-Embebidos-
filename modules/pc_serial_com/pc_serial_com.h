@@ -4,6 +4,7 @@
 #define _PC_SERIAL_COM_H_
 
 //=====[Declaration of public defines]=========================================
+
 //=====[Declaration of public data types]======================================
 
 //=====[Declarations (prototypes) of public functions]=========================

@@ -8,10 +8,9 @@
 //=====[Declaration of public data types]======================================
 
 typedef enum {
-    FEEDER_CLOSED,
-    FEEDER_OPEN,
-    FEEDER_OPENING,
-    FEEDER_CLOSING,
+    FEEDER_FREE_MODE,
+     FEEDER_MANUAL_MODE,
+      FEEDER_TIME_MODE
 } feederStatus_t;
 
 //=====[Declarations (prototypes) of public functions]=========================
