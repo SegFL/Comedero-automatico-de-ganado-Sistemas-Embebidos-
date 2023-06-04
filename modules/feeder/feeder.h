@@ -3,15 +3,16 @@
 #ifndef _FEEDER_H_
 #define _FEEDER_H_
 
+#include "time.h"
 //=====[Declaration of public defines]=========================================
-#define MOTOR_UPDATE_TIME 10
 //=====[Declaration of public data types]======================================
 
 typedef enum {
+    FEEDER_MANUAL_MODE,
     FEEDER_FREE_MODE,
-     FEEDER_MANUAL_MODE,
-      FEEDER_TIME_MODE
+    FEEDER_TIME_MODE
 } feederStatus_t;
+
 
 //=====[Declarations (prototypes) of public functions]=========================
 
@@ -20,6 +21,9 @@ void feederUpdate();
 
 
 feederStatus_t feederStatusRead();
+void feederStatusWrite(feederStatus_t);
+
+bool feederTimeSet();
 
 //=====[#include guards - end]=================================================
 

@@ -1,12 +1,11 @@
 //=====[Libraries]=============================================================
 
-#include "motor.h"
-//#include "pc_serial_com.h"
+#include "feeder.h"
+#include "pc_serial_com.h"
 
 //=====[Declaration of private defines]========================================
 
 
-#define SYSTEM_TIME_INCREMENT_MS 10
 
 //=====[Declaration of private data types]=====================================
 
@@ -26,8 +25,8 @@
 
 void mainSystemInit()
 {
-
-  // pcSerialComInit();
+    feederInit();
+    pcSerialComInit();
   // nonBlockingDelayInit( &mainSystemDelay, SYSTEM_TIME_INCREMENT_MS );
 
 }
@@ -36,8 +35,8 @@ void mainSystemUpdate()
 {
    
 
-
-       // pcSerialComUpdate();
+    feederUpdate();
+    pcSerialComUpdate();
 
 
 }

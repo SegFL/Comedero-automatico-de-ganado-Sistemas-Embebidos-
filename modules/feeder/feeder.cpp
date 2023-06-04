@@ -6,9 +6,15 @@
 #include "feeder.h"
 #include "motor.h"
 
+DigitalOut modomanual(LED1);
+DigitalOut modofree(LED2);
+DigitalOut modotiempo(LED3);
+
 //=====[Declaration of private defines]========================================
 
 //=====[Declaration of private data types]=====================================
+
+
 
 //=====[Declaration and initialization of public global objects]===============
 
@@ -23,6 +29,10 @@ motor motorArray[] = {motor(PF_2, PE_3), motor(PH_0, PH_1)};
 
 static feederStatus_t feederStatus;
 
+struct tm startTime;//tiempo de inicio del evento en TIME MODE
+int durationTime;
+
+
 //=====[Declarations (prototypes) of private functions]========================
 
 
@@ -34,8 +44,6 @@ void feederInit(){
 
 }
 void feederUpdate() {
-  // Ambos motores tienen el mismo counter lo que singifica que ambos se
-  // actualizan en el mismo ciclo.
 
 
     for (int i = 0; i < 2; i++) {
@@ -68,10 +76,58 @@ void feederUpdate() {
       }
     }
 
+
+//pruebas con leds
+    switch(feederStatus){
+        case   FEEDER_MANUAL_MODE:{
+            modomanual.write(ON);
+            modofree.write(OFF);
+            modotiempo.write(OFF);
+            break;
+        }
+                case     FEEDER_FREE_MODE:{
+            modomanual.write(OFF);
+            modofree.write(ON);
+            modotiempo.write(OFF);
+            break;
+        }
+                case     FEEDER_TIME_MODE:{
+            modomanual.write(OFF);
+            modofree.write(OFF);
+            modotiempo.write(ON);
+            break;
+        }
+    }
+
 }
 
 feederStatus_t feederStatusRead(){
 
     return feederStatus;
+
+}
+
+void feederStatusWrite(feederStatus_t status){
+
+    feederStatus = status;
+
+}
+
+bool feederTimeSet( int year1, int month1, int day1, 
+                       int hour1, int minute1, int second1, int duration){
+
+
+    startTime.tm_year = year1 - 1900;
+    startTime.tm_mon  = month1 - 1;
+    startTime.tm_mday = day1;
+    startTime.tm_hour = hour1;
+    startTime.tm_min  = minute1;
+    startTime.tm_sec  = second1;
+    startTime.tm_isdst = -1;
+
+    durationTime = duration;
+
+
+
 
 }
