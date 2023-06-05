@@ -22,11 +22,13 @@ class motor{
         DigitalInOut motorPin2;
         
         motor(PinName pin1, PinName pin2);
-        motorDirection_t read();
-        void write(motorDirection_t d);
-    private:
         motorDirection_t read_state();
         void change_state(motorDirection_t state);
+        motorDirection_t read();
+        void write(motorDirection_t d);
+
+
+
 
  };
 

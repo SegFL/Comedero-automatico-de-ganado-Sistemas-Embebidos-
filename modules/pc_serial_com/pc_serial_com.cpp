@@ -165,9 +165,9 @@ static void availableCommands(){
     pcSerialComStringWrite( "\r\n" );
 }
 static void commandShowCurrentFeederState(){
-    feederStatus_t estate =  feederStatusRead();
 
-    switch(estate){
+
+    switch(feederStatusRead()){
         case FEEDER_FREE_MODE: {
             pcSerialComStringWrite( "Feeder en modo FREE MODE:\r\n" );
             break;

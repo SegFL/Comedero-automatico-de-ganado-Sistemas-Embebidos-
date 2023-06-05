@@ -48,32 +48,28 @@ void feederUpdate() {
 
     for (int i = 0; i < 2; i++) {
 
-      switch (motorArray[i].read()) {
-      case DIRECTION_1:
-        if (motorArray[i].read() == DIRECTION_2 ||
-            motorArray[i].read() == STOPPED) {
+      switch (motorArray[i].read_state()) {
+        case DIRECTION_1:
+            if (motorArray[i].read() != DIRECTION_1) {
+                motorArray[i].change_state(STOPPED);
+            }
+            break;
 
-          motorArray[i].write(STOPPED);
+        case DIRECTION_2:
+            if (motorArray[i].read() != DIRECTION_2) {
+                 motorArray[i].change_state(STOPPED);
+            }
+            break;
+
+        case STOPPED:
+        default:
+            if (motorArray[i].read() == DIRECTION_1) {
+                motorArray[i].change_state(DIRECTION_1);
+            }else if (motorArray[i].read() == DIRECTION_2) {
+                motorArray[i].change_state(DIRECTION_2);
+            }
+            break;
         }
-        break;
-
-      case DIRECTION_2:
-        if (motorArray[i].read() == DIRECTION_1 ||
-            motorArray[i].read() == STOPPED) {
-
-          motorArray[i].write(STOPPED);
-        }
-        break;
-
-      case STOPPED:
-      default:
-        if (motorArray[i].read() == DIRECTION_1) {
-          motorArray[i].write(DIRECTION_1);
-        }else if (motorArray[i].read() == DIRECTION_2) {
-         motorArray[i].write(DIRECTION_2);
-        }
-        break;
-      }
     }
 
 
