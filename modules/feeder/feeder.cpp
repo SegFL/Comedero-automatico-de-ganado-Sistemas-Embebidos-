@@ -109,7 +109,7 @@ void feederStatusWrite(feederStatus_t status){
 
 }
 
-bool feederTimeSet( int year1, int month1, int day1, 
+void feederTimeSet( int year1, int month1, int day1, 
                        int hour1, int minute1, int second1, int duration){
 
 
