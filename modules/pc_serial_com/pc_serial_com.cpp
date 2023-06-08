@@ -164,6 +164,8 @@ static void availableCommands(){
     pcSerialComStringWrite( "Press '2' to set the feeder state\r\n" );
     pcSerialComStringWrite( "Press '3' ShowDateAndTime\r\n" );
     pcSerialComStringWrite( "Press '4' SetDateAndTime\r\n" );
+    pcSerialComStringWrite( "Press '5' SetFeederTime\r\n" );
+
 
     pcSerialComStringWrite( "\r\n" );
 }
@@ -268,8 +270,14 @@ static void commandSetDateAndTime(const char receivedChar)
     static dateAndTime dat;
     static int indice;
 
-    //En caso de que el caracter sea nulo no hago nada
+
     if(receivedChar =='\0') {
+/*
+        if(feederStatusRead()!=FEEDER_TIME_MODE){
+            pcSerialComStringWrite("\r\nThe feeder is not in TIME MODE ");
+            return;
+        }
+ */
         pcSerialComStringWrite("\r\nType four digits for the current year (YYYY): ");
         pcSerialComMode=PC_SERIAL_SETTING_DATE;
         date_and_time_status = SETTING_YEAR;

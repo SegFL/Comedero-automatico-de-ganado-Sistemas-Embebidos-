@@ -9,10 +9,17 @@
 #include "stdlib.h"
 #include "string.h"
 
+#ifdef _PROBANDO_MODOS
 DigitalOut modomanual(LED1);
 DigitalOut modofree(LED2);
 DigitalOut modotiempo(LED3);
+#endif 
 
+#ifdef _PROBANDO_MOTORES
+DigitalOut motor1izq(LED1);
+DigitalOut motor1stop(LED2);
+DigitalOut motor1der(LED3);
+#endif
 //=====[Declaration of private defines]========================================
 
 //=====[Declaration of private data types]=====================================
@@ -74,6 +81,26 @@ void feederUpdate() {
             break;
         }
     }
+
+#ifdef _PROBANDO_MOTOR
+switch(motorArray[0].read()){
+    case DIRECTION_1:{
+        motor1izq.write(ON);
+        motor1stop.write(OFF);
+        motor1der.write(OFF);
+    }break;
+    case DIRECTION_2:{
+        motor1izq.write(OFF);
+        motor1stop.write(OFF);
+        motor1der.write(ON);
+    }break;
+    case STOPPED:{
+        motor1izq.write(OFF);
+        motor1stop.write(ON);
+        motor1der.write(OFF);
+    }break;
+}
+#endif
 
 #ifdef _PROBANDO_MODOS
 #define _PROBANDO_MODOS
