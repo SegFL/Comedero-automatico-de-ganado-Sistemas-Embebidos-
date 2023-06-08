@@ -1,10 +1,13 @@
 //=====[Libraries]=============================================================
 
+
 #include "mbed.h"
 #include "arm_book_lib.h"
 
 #include "feeder.h"
 #include "motor.h"
+#include "stdlib.h"
+#include "string.h"
 
 DigitalOut modomanual(LED1);
 DigitalOut modofree(LED2);
@@ -72,7 +75,8 @@ void feederUpdate() {
         }
     }
 
-
+#ifdef _PROBANDO_MODOS
+#define _PROBANDO_MODOS
 //pruebas con leds
     switch(feederStatus){
         case   FEEDER_MANUAL_MODE:{
@@ -94,6 +98,7 @@ void feederUpdate() {
             break;
         }
     }
+#endif 
 
 }
 
@@ -123,7 +128,45 @@ void feederTimeSet( int year1, int month1, int day1,
 
     durationTime = duration;
 
+}
 
+char* feederTimeRead(){
 
+    time_t epochSeconds;
+    epochSeconds = time(NULL);
+
+    char* buffer = (char*)malloc(10 * sizeof(char)); // Buffer para convertir el entero a cadena
+    if (buffer == NULL) {
+        return NULL;
+    }
+
+    char* cadena = (char*)malloc(100 * sizeof(char));
+    if (cadena == NULL) {
+        return NULL;
+    }
+
+    strcpy(cadena, ctime(&epochSeconds));
+    strcat(cadena, "Duration:");
+    sprintf(buffer, "%d", durationTime);
+    strcat(cadena, buffer);
+
+    free(buffer); // Liberamos la memoria asignada para el buffer
+
+    return cadena;
 
 }
+
+/*
+char* feederTimeRead(){
+
+    char buffer[10];
+    char cadena[100];
+    time_t epochSeconds;
+    epochSeconds = time(NULL);
+    strcat(cadena,ctime(&epochSeconds));
+    strcat(cadena,"Duration:");
+    strcat(cadena,itoa(durationTime,buffer,DECIMAL));
+    return cadena;    
+}
+
+*/

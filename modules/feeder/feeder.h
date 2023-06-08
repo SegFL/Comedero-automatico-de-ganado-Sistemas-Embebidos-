@@ -23,7 +23,7 @@ void feederUpdate();
 feederStatus_t feederStatusRead();
 void feederStatusWrite(feederStatus_t);
 
-void feederTimeSet();
+char* feederTimeRead();
 void feederTimeSet( int year1, int month1, int day1, 
                        int hour1, int minute1, int second1, int duration);
 

@@ -32,17 +32,19 @@ struct dateAndTime{
 	char hour[3] = "";
 	char minute[3] = "";
 	char second[3] = "";
+	char duration[3]="";
 };
 
 
 
-//Un tipo de dato que utiliza la funcion commandSetDateAndTime para saber que campo de la fecha y hora se esta modificando
+//Un tipo de dato que utiliza por funciones para saber que campo de la fecha y hora se esta modificando
 typedef enum {  SETTING_YEAR,
                 SETTING_MONTH,
                 SETTING_DAY,
                 SETTING_HOUR,
                 SETTING_MINUTE,
                 SETTING_SECOND,
+		SETTING_DURATION,
                 SETTING_DESACTIVATE,
  } setting_date_and_time_status_t;
 
@@ -68,16 +70,17 @@ setting_date_and_time_status_t date_and_time_status = SETTING_DESACTIVATE;
 
 static void pcSerialComStringRead( char* str, int strLength );
 
-static void pcSerialComCommandUpdate( char receivedChar );
+static void pcSerialComCommandUpdate( const char receivedChar );
 static void availableCommands();
 
 static void commandShowCurrentFeederStatus();
-static void commandSetFeederStatus(char);
-static void commandSetFeederTime(const char charReceived);
+static void commandSetFeederStatus(const char receivedChar);
+static void commandSetFeederTime(const char receivedChar);
+static void commandShowFeederTime();
 
 
 
-static void commandSetDateAndTime(const char charReceived);
+static void commandSetDateAndTime(const char receivedChar);
 static void commandShowDateAndTime();
 
 
@@ -113,6 +116,12 @@ void pcSerialComUpdate()
             case PC_SERIAL_SETTING_DATE:
                 commandSetDateAndTime( receivedChar );
                 break;
+            case PC_SERIAL_SETTING_FEEDER_STATUS:
+                commandSetFeederStatus(receivedChar);
+                break;
+            case PC_SERIAL_SETTING_FEEDER_TIME:
+                commandSetFeederTime(receivedChar);
+                break;
             default:
                 pcSerialComMode = PC_SERIAL_COMMANDS;
                 break;
@@ -143,6 +152,7 @@ static void pcSerialComCommandUpdate( char receivedChar )
         case '2': commandSetFeederStatus('\0'); break;
         case '3': commandShowDateAndTime(); break;
         case '4': commandSetDateAndTime('\0'); break;
+        case '5': commandSetFeederTime('\0');break;
         default: availableCommands(); break;
     } 
 }
@@ -189,27 +199,25 @@ static void commandShowDateAndTime()
 }
 
 
-static void commandSetFeederStatus(char charReceived)
+static void commandSetFeederStatus(char receivedChar)
 {
     feederStatus_t mode = FEEDER_MANUAL_MODE;
 
-    if(charReceived=='\0'){
+    if(receivedChar=='\0'){
         pcSerialComMode=PC_SERIAL_SETTING_FEEDER_STATUS;
         pcSerialComStringWrite( "Press '1' to set the feeder state to MANUAL MODE\r\n" );
         pcSerialComStringWrite( "Press '2' to set the feeder state to FREE MODE\r\n" );    
         pcSerialComStringWrite( "Press '3' to set the feeder state to TIME MODE\r\n" );
         pcSerialComStringWrite("\r\n");
     }else {
-        switch(charReceived){
+        switch(receivedChar){
             case '1':{
                 mode=FEEDER_MANUAL_MODE;
                 break;
-
             }
            case '2':{
                 mode=FEEDER_FREE_MODE;
                 break;
-
             }
             case '3':{
                  mode=FEEDER_TIME_MODE;
@@ -254,14 +262,14 @@ void commandShowCurrentFeederStatus(){
 }   
 
 
-static void commandSetDateAndTime(const char charReceived)
+static void commandSetDateAndTime(const char receivedChar)
 {
 
     static dateAndTime dat;
     static int indice;
 
     //En caso de que el caracter sea nulo no hago nada
-    if(charReceived =='\0') {
+    if(receivedChar =='\0') {
         pcSerialComStringWrite("\r\nType four digits for the current year (YYYY): ");
         pcSerialComMode=PC_SERIAL_SETTING_DATE;
         date_and_time_status = SETTING_YEAR;
@@ -275,7 +283,7 @@ static void commandSetDateAndTime(const char charReceived)
         switch (date_and_time_status) {
             case SETTING_YEAR: {
                 if (indice < 4) {
-                    dat.year[indice] = charReceived;
+                    dat.year[indice] = receivedChar;
                     indice++;
                 }
                 if (indice == 4) {
@@ -290,7 +298,7 @@ static void commandSetDateAndTime(const char charReceived)
 
             case SETTING_MONTH: {
                     if (indice < 2) {
-                        dat.month[indice] = charReceived;
+                        dat.month[indice] = receivedChar;
                         indice++;
                     }
                     if (indice == 2) {
@@ -304,7 +312,7 @@ static void commandSetDateAndTime(const char charReceived)
 
             case SETTING_DAY: {
                     if (indice < 2) {
-                        dat.day[indice] = charReceived;
+                        dat.day[indice] = receivedChar;
                         indice++;
                     }
                     if (indice == 2) {
@@ -319,7 +327,7 @@ static void commandSetDateAndTime(const char charReceived)
 
             case SETTING_HOUR: {
                 if (indice < 2) {
-                    dat.hour[indice] = charReceived;
+                    dat.hour[indice] = receivedChar;
                     indice++;
                 }
                 if (indice == 2) {
@@ -334,7 +342,7 @@ static void commandSetDateAndTime(const char charReceived)
 
             case SETTING_MINUTE: {
                 if (indice < 2) {
-                    dat.second[indice] = charReceived;
+                    dat.second[indice] = receivedChar;
                     indice++;
 
                 }
@@ -350,7 +358,7 @@ static void commandSetDateAndTime(const char charReceived)
 
             case SETTING_SECOND: {
                 if (indice < 2) {
-                    dat.second[indice] = charReceived;
+                    dat.second[indice] = receivedChar;
                     indice++;
                 }
                 if (indice == 2) {
@@ -360,6 +368,7 @@ static void commandSetDateAndTime(const char charReceived)
                             atoi(dat.minute), atoi(dat.second));
                     pcSerialComStringWrite("\r\n");
                     pcSerialComStringWrite("Date and time has been set\r\n");
+                    commandShowDateAndTime();
                     date_and_time_status = SETTING_DESACTIVATE;
                     pcSerialComMode=PC_SERIAL_COMMANDS;
                 }    
@@ -369,4 +378,140 @@ static void commandSetDateAndTime(const char charReceived)
                 pcSerialComMode=PC_SERIAL_COMMANDS;
             } break;
         }
+}
+
+static void commandSetFeederTime(const char receivedChar){
+
+    static dateAndTime dat;
+    static int indice;
+
+    //En caso de que el caracter sea nulo no hago nada
+    if(receivedChar =='\0') {
+        pcSerialComStringWrite("\r\nType four digits for the current year (YYYY): ");
+        pcSerialComMode=PC_SERIAL_SETTING_FEEDER_TIME;
+        date_and_time_status = SETTING_YEAR;
+        indice = 0;
+        return;
+    }
+
+
+        switch (date_and_time_status) {
+            case SETTING_YEAR: {
+                if (indice < 4) {
+                    dat.year[indice] = receivedChar;
+                    indice++;
+                }
+                if (indice == 4) {
+                    dat.year[4] = '\0';
+                    indice = 0;
+                    date_and_time_status = SETTING_MONTH;
+                    pcSerialComStringWrite("\r\n");
+                    pcSerialComStringWrite(
+                        "Type two digits for the current month (01-12): ");
+                }        
+            } break;
+
+            case SETTING_MONTH: {
+                    if (indice < 2) {
+                        dat.month[indice] = receivedChar;
+                        indice++;
+                    }
+                    if (indice == 2) {
+                    dat.month[2] = '\0';
+                    indice = 0;
+                    date_and_time_status = SETTING_DAY;
+                    pcSerialComStringWrite("\r\n");
+                    pcSerialComStringWrite("Type two digits for the current day (01-31): ");
+                    }
+            } break;
+
+            case SETTING_DAY: {
+                    if (indice < 2) {
+                        dat.day[indice] = receivedChar;
+                        indice++;
+                    }
+                    if (indice == 2) {
+                        dat.day[2] = '\0';
+                        indice = 0;
+                        date_and_time_status = SETTING_HOUR;
+                        pcSerialComStringWrite("\r\n");
+                        pcSerialComStringWrite(
+                            "Type two digits for the current hour (00-23): ");
+                    }    
+            } break;
+
+            case SETTING_HOUR: {
+                if (indice < 2) {
+                    dat.hour[indice] = receivedChar;
+                    indice++;
+                }
+                if (indice == 2) {
+                    dat.hour[2] = '\0';
+                    indice = 0;
+                    date_and_time_status = SETTING_MINUTE;
+                    pcSerialComStringWrite("\r\n");
+                    pcSerialComStringWrite(
+                     "Type two digits for the current minutes (00-59): ");
+                }
+            } break;
+            case SETTING_MINUTE: {
+                if (indice < 2) {
+                    dat.second[indice] = receivedChar;
+                    indice++;
+
+                }
+                if (indice == 2) {
+                    dat.second[2] = '\0';
+                    indice = 0;
+                    date_and_time_status = SETTING_SECOND;
+                    pcSerialComStringWrite("\r\n");
+                    pcSerialComStringWrite(
+                        "Type two digits for the current seconds (00-59): ");
+                }        
+            } break;
+            case SETTING_SECOND: {
+                if (indice < 2) {
+                    dat.second[indice] = receivedChar;
+                    indice++;
+                }
+                if (indice == 2) {
+                    dat.second[2] = '\0';
+                    indice = 0;
+                    pcSerialComStringWrite("\r\n");
+			pcSerialComStringWrite("Type the duration of the event\r\n");
+                    date_and_time_status = SETTING_DURATION;
+                }    
+            } break;
+	    
+	    case SETTING_DURATION:{
+		if (indice < 2) {
+                    dat.duration[indice] = receivedChar;
+                    indice++;
+                }
+                if (indice == 2) {
+                    dat.second[2] = '\0';
+                    indice = 0;
+		    feederTimeSet(atoi(dat.year), atoi(dat.month), atoi(dat.day), atoi(dat.hour),
+                            atoi(dat.minute), atoi(dat.second),atoi(dat.duration));
+                    pcSerialComStringWrite("\r\n");
+                    pcSerialComStringWrite(" The time and duaration has been set\r\n");
+                    commandShowFeederTime();
+	
+                    date_and_time_status = SETTING_DESACTIVATE;
+		    pcSerialComMode=PC_SERIAL_COMMANDS;
+                }    
+	    }break;
+            case SETTING_DESACTIVATE: {
+                pcSerialComMode=PC_SERIAL_COMMANDS;
+            } break;
+        }
+    
+}
+
+static void commandShowFeederTime()
+{
+    char str[100] = "";
+    sprintf ( str, "Feeder time = %s",feederTimeRead() );
+    pcSerialComStringWrite( str );
+    pcSerialComStringWrite("\r\n");
 }
