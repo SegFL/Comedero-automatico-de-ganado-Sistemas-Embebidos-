@@ -44,7 +44,7 @@ typedef enum {  SETTING_YEAR,
                 SETTING_HOUR,
                 SETTING_MINUTE,
                 SETTING_SECOND,
-		SETTING_DURATION,
+		        SETTING_DURATION,
                 SETTING_DESACTIVATE,
  } setting_date_and_time_status_t;
 
@@ -153,6 +153,9 @@ static void pcSerialComCommandUpdate( char receivedChar )
         case '3': commandShowDateAndTime(); break;
         case '4': commandSetDateAndTime('\0'); break;
         case '5': commandSetFeederTime('\0');break;
+        case '6': commandShowFeederTime();break;
+        case 'z': case 'x':case 'c': updateManualMode(receivedChar);break;
+        
         default: availableCommands(); break;
     } 
 }
@@ -165,6 +168,8 @@ static void availableCommands(){
     pcSerialComStringWrite( "Press '3' ShowDateAndTime\r\n" );
     pcSerialComStringWrite( "Press '4' SetDateAndTime\r\n" );
     pcSerialComStringWrite( "Press '5' SetFeederTime\r\n" );
+    pcSerialComStringWrite( "Press '6' GetFeederTime\r\n" );
+    pcSerialComStringWrite( "Press 'Z','X','C' to move de motors (ONLY IN MANUAL MODE)\r\n" );
 
 
     pcSerialComStringWrite( "\r\n" );
@@ -395,7 +400,7 @@ static void commandSetFeederTime(const char receivedChar){
 
     //En caso de que el caracter sea nulo no hago nada
     if(receivedChar =='\0') {
-        pcSerialComStringWrite("\r\nType four digits for the current year (YYYY): ");
+        pcSerialComStringWrite("\r\nType four digits for the current year(feeder) (YYYY): ");
         pcSerialComMode=PC_SERIAL_SETTING_FEEDER_TIME;
         date_and_time_status = SETTING_YEAR;
         indice = 0;
@@ -432,7 +437,6 @@ static void commandSetFeederTime(const char receivedChar){
                     pcSerialComStringWrite("Type two digits for the current day (01-31): ");
                     }
             } break;
-
             case SETTING_DAY: {
                     if (indice < 2) {
                         dat.day[indice] = receivedChar;
@@ -499,8 +503,8 @@ static void commandSetFeederTime(const char receivedChar){
                 if (indice == 2) {
                     dat.second[2] = '\0';
                     indice = 0;
-		    feederTimeSet(atoi(dat.year), atoi(dat.month), atoi(dat.day), atoi(dat.hour),
-                            atoi(dat.minute), atoi(dat.second),atoi(dat.duration));
+		    feederTimeSet(atoi(dat.year), atoi(dat.month), atoi(dat.day), atoi  (dat.hour),
+                atoi(dat.minute), atoi(dat.second),atoi(dat.duration));
                     pcSerialComStringWrite("\r\n");
                     pcSerialComStringWrite(" The time and duaration has been set\r\n");
                     commandShowFeederTime();

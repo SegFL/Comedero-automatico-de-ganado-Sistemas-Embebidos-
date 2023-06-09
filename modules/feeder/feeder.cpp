@@ -9,6 +9,10 @@
 #include "stdlib.h"
 #include "string.h"
 
+#include "time.h"
+#include "date_and_time.h"
+
+#define _PROBANDO_MOTORES
 #ifdef _PROBANDO_MODOS
 DigitalOut modomanual(LED1);
 DigitalOut modofree(LED2);
@@ -46,6 +50,8 @@ int durationTime;
 //=====[Declarations (prototypes) of private functions]========================
 
 
+void updateFeederTimeMode();
+
 //=====[Implementations of public functions]===================================
 
 void feederInit(){
@@ -55,9 +61,21 @@ void feederInit(){
 }
 void feederUpdate() {
 
+    switch(feederStatus){
+        case FEEDER_MANUAL_MODE:{
+            //updateManualMode();
+        }break;
+        case FEEDER_FREE_MODE:{
+            
+        }break;
+        case FEEDER_TIME_MODE:{
+            updateFeederTimeMode();
+        }
+        default:{
 
+        }
+    }
     for (int i = 0; i < 2; i++) {
-
       switch (motorArray[i].read_state()) {
         case DIRECTION_1:
             if (motorArray[i].read() != DIRECTION_1) {
@@ -82,7 +100,7 @@ void feederUpdate() {
         }
     }
 
-#ifdef _PROBANDO_MOTOR
+#ifdef _PROBANDO_MOTORES
 switch(motorArray[0].read()){
     case DIRECTION_1:{
         motor1izq.write(ON);
@@ -106,19 +124,19 @@ switch(motorArray[0].read()){
 #define _PROBANDO_MODOS
 //pruebas con leds
     switch(feederStatus){
-        case   FEEDER_MANUAL_MODE:{
+        case FEEDER_MANUAL_MODE:{
             modomanual.write(ON);
             modofree.write(OFF);
             modotiempo.write(OFF);
             break;
         }
-                case     FEEDER_FREE_MODE:{
+        case FEEDER_FREE_MODE:{
             modomanual.write(OFF);
             modofree.write(ON);
             modotiempo.write(OFF);
             break;
         }
-                case     FEEDER_TIME_MODE:{
+        case FEEDER_TIME_MODE:{
             modomanual.write(OFF);
             modofree.write(OFF);
             modotiempo.write(ON);
@@ -159,6 +177,9 @@ void feederTimeSet( int year1, int month1, int day1,
 
 char* feederTimeRead(){
 
+    if(feederStatus!=FEEDER_TIME_MODE){
+        return NULL;
+    }
     time_t epochSeconds;
     epochSeconds = time(NULL);
 
@@ -172,7 +193,7 @@ char* feederTimeRead(){
         return NULL;
     }
 
-    strcpy(cadena, ctime(&epochSeconds));
+    strcpy(cadena, asctime(&startTime));
     strcat(cadena, "Duration:");
     sprintf(buffer, "%d", durationTime);
     strcat(cadena, buffer);
@@ -183,17 +204,33 @@ char* feederTimeRead(){
 
 }
 
-/*
-char* feederTimeRead(){
 
-    char buffer[10];
-    char cadena[100];
-    time_t epochSeconds;
-    epochSeconds = time(NULL);
-    strcat(cadena,ctime(&epochSeconds));
-    strcat(cadena,"Duration:");
-    strcat(cadena,itoa(durationTime,buffer,DECIMAL));
-    return cadena;    
+
+void updateFeederTimeMode(){
+
+    //struct tm date;
+    //strftime(dateAndTimeRead(),50,"%Y-%m-%d %H:%M:%S",date);
+    //printf("%s\n",dateAndTimeRead());
+    
+
 }
 
-*/
+void updateManualMode(const char charReceived){
+
+printf("%s\n","entre");
+    motorDirection_t d;
+    if(feederStatus!=FEEDER_MANUAL_MODE){
+        return;
+    }
+    switch(charReceived){
+        case 'z':case 'Z':  d=DIRECTION_1;  break;
+        case 'x':case 'X':  d=STOPPED;  break;
+        case 'c':case 'C':  d=DIRECTION_2;  break;
+    }
+
+    for (int i = 0; i < 2; i++) {
+        motorArray[i].write(d);
+    }
+
+
+}

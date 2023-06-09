@@ -3,7 +3,7 @@
 #ifndef _FEEDER_H_
 #define _FEEDER_H_
 
-#include "time.h"
+
 //=====[Declaration of public defines]=========================================
 //=====[Declaration of public data types]======================================
 
@@ -27,6 +27,7 @@ void feederStatusWrite(feederStatus_t);
 char* feederTimeRead();
 void feederTimeSet( int year1, int month1, int day1, 
                        int hour1, int minute1, int second1, int duration);
+void updateManualMode(const char charReceived);
 
 //=====[#include guards - end]=================================================
 
