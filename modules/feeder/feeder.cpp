@@ -13,6 +13,10 @@
 #include "date_and_time.h"
 
 #define _PROBANDO_MOTORES
+
+
+
+
 #ifdef _PROBANDO_MODOS
 DigitalOut modomanual(LED1);
 DigitalOut modofree(LED2);
@@ -60,6 +64,8 @@ void feederInit(){
 
 }
 void feederUpdate() {
+
+    updateFeederTimeMode();
 
     switch(feederStatus){
         case FEEDER_MANUAL_MODE:{
@@ -208,16 +214,33 @@ char* feederTimeRead(){
 
 void updateFeederTimeMode(){
 
-    //struct tm date;
-    //strftime(dateAndTimeRead(),50,"%Y-%m-%d %H:%M:%S",date);
-    //printf("%s\n",dateAndTimeRead());
+    if(feederStatus!=FEEDER_TIME_MODE)
+        return;
+    struct tm date;
+    strftime(dateAndTimeRead(),50,"%Y-%m-%d %H:%M:%S",&date);
+    //printf("%f\n",difftime(mktime(&date),mktime(&startTime)));
+
+        if(difftime(mktime(&date),mktime(&startTime))<0){
+            
+            for (int i = 0; i < 2; i++) {
+                motorArray[i].write(DIRECTION_1);
+             }
+
+        }else{
+
+            for (int i = 0; i < 2; i++) {
+                motorArray[i].write(STOPPED);
+            }
+        }
+
     
 
 }
 
+//Cambia el la direccion de los motores(el valor se actualiza al ejecutar la funcion feederUpdate())
 void updateManualMode(const char charReceived){
 
-printf("%s\n","entre");
+
     motorDirection_t d;
     if(feederStatus!=FEEDER_MANUAL_MODE){
         return;

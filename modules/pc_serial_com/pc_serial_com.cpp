@@ -277,12 +277,6 @@ static void commandSetDateAndTime(const char receivedChar)
 
 
     if(receivedChar =='\0') {
-/*
-        if(feederStatusRead()!=FEEDER_TIME_MODE){
-            pcSerialComStringWrite("\r\nThe feeder is not in TIME MODE ");
-            return;
-        }
- */
         pcSerialComStringWrite("\r\nType four digits for the current year (YYYY): ");
         pcSerialComMode=PC_SERIAL_SETTING_DATE;
         date_and_time_status = SETTING_YEAR;
@@ -352,15 +346,13 @@ static void commandSetDateAndTime(const char receivedChar)
                      "Type two digits for the current minutes (00-59): ");
                 }
             } break;
-
             case SETTING_MINUTE: {
                 if (indice < 2) {
-                    dat.second[indice] = receivedChar;
+                    dat.minute[indice] = receivedChar;
                     indice++;
-
                 }
                 if (indice == 2) {
-                    dat.second[2] = '\0';
+                    dat.minute[2] = '\0';
                     indice = 0;
                     date_and_time_status = SETTING_SECOND;
                     pcSerialComStringWrite("\r\n");
@@ -398,6 +390,10 @@ static void commandSetFeederTime(const char receivedChar){
     static dateAndTime dat;
     static int indice;
 
+    if(feederStatusRead()!=FEEDER_TIME_MODE){
+            pcSerialComStringWrite("\r\nThe feeder is not in TIME MODE ");
+            return;
+    }
     //En caso de que el caracter sea nulo no hago nada
     if(receivedChar =='\0') {
         pcSerialComStringWrite("\r\nType four digits for the current year(feeder) (YYYY): ");
@@ -468,12 +464,12 @@ static void commandSetFeederTime(const char receivedChar){
             } break;
             case SETTING_MINUTE: {
                 if (indice < 2) {
-                    dat.second[indice] = receivedChar;
+                    dat.minute[indice] = receivedChar;
                     indice++;
 
                 }
                 if (indice == 2) {
-                    dat.second[2] = '\0';
+                    dat.minute[2] = '\0';
                     indice = 0;
                     date_and_time_status = SETTING_SECOND;
                     pcSerialComStringWrite("\r\n");
@@ -522,6 +518,10 @@ static void commandSetFeederTime(const char receivedChar){
 
 static void commandShowFeederTime()
 {
+     if(feederStatusRead()!=FEEDER_TIME_MODE){
+            pcSerialComStringWrite("\r\nThe feeder is not in TIME MODE ");
+            return;
+     }
     char str[100] = "";
     sprintf ( str, "Feeder time = %s",feederTimeRead() );
     pcSerialComStringWrite( str );
