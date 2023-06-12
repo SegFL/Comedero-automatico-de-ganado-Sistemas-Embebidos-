@@ -317,8 +317,8 @@ void feederFreeModeInit(const char* uid){
 
         for (int i = 0; i < 2; i++) {
             motorArray[i].write(DIRECTION_1);
-            nonBlockingDelayInit(&freeModeDelay,2000);
         }
+        nonBlockingDelayInit(&freeModeDelay,2000);
 
     }
     
