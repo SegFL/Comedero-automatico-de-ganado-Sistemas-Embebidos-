@@ -276,7 +276,7 @@ void feederTimeModeUpdate(){
 }
 
 //Cambia el la direccion de los motores(el valor se actualiza al ejecutar la funcion feederUpdate())
-void updateManualMode(const char receivedChar){
+void manualModeUpdate(const char receivedChar){
 
 
     motorDirection_t d=STOPPED;
