@@ -2,6 +2,7 @@
 
 #include "feeder.h"
 #include "pc_serial_com.h"
+#include "rfid.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -27,7 +28,8 @@ void mainSystemInit()
 {
     feederInit();
     pcSerialComInit();
-  // nonBlockingDelayInit( &mainSystemDelay, SYSTEM_TIME_INCREMENT_MS );
+    rfidInit();
+  //nonBlockingDelayInit( &mainSystemDelay, SYSTEM_TIME_INCREMENT_MS );
 
 }
 
@@ -37,6 +39,7 @@ void mainSystemUpdate()
 
     feederUpdate();
     pcSerialComUpdate();
+    rfidUpdate();
 
 
 }

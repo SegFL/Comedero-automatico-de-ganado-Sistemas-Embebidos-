@@ -122,6 +122,7 @@ void pcSerialComUpdate()
             case PC_SERIAL_SETTING_FEEDER_TIME:
                 commandSetFeederTime(receivedChar);
                 break;
+
             default:
                 pcSerialComMode = PC_SERIAL_COMMANDS;
                 break;
@@ -154,7 +155,7 @@ static void pcSerialComCommandUpdate( char receivedChar )
         case '4': commandSetDateAndTime('\0'); break;
         case '5': commandSetFeederTime('\0');break;
         case '6': commandShowFeederTime();break;
-        case 'z': case 'x':case 'c': updateManualMode(receivedChar);break;
+        case 'z': case 'x':case 'c':case 'Z':case 'X':case 'C': manualModeUpdate(receivedChar);break;
         
         default: availableCommands(); break;
     } 

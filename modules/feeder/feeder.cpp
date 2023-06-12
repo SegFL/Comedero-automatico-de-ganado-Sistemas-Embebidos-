@@ -8,14 +8,20 @@
 #include "motor.h"
 #include "stdlib.h"
 #include "string.h"
+#include "non_blocking_delay.h"
 
 #include "time.h"
 #include "date_and_time.h"
 
+
 #define _PROBANDO_MOTORES
 
 
-
+#ifdef _PROBANDO_PINES
+DigitalOut d1(LED1);
+DigitalOut s(LED2);
+DigitalOut d2(LED3);
+#endif  
 
 #ifdef _PROBANDO_MODOS
 DigitalOut modomanual(LED1);
@@ -36,7 +42,7 @@ DigitalOut motor1der(LED3);
 
 //=====[Declaration and initialization of public global objects]===============
 
-motor motorArray[] = {motor(PF_2, PE_3), motor(PH_0, PH_1)};
+motor motorArray[] = {motor(MOTOR1_PIN1 , MOTOR1_PIN2), motor(MOTOR2_PIN1, MOTOR2_PIN2)};
 
 //=====[Declaration of external public global variables]=======================
 
@@ -46,7 +52,7 @@ motor motorArray[] = {motor(PF_2, PE_3), motor(PH_0, PH_1)};
 
 
 static feederStatus_t feederStatus;
-
+static nonBlockingDelay_t freeModeDelay;
 struct tm startTime;//tiempo de inicio del evento en TIME MODE
 int durationTime;
 
@@ -54,7 +60,11 @@ int durationTime;
 //=====[Declarations (prototypes) of private functions]========================
 
 
-void updateFeederTimeMode();
+static bool validate_uid(const char* uid);
+
+static void feederTimeModeUpdate();
+static void feederFreeModeUpdate();
+
 
 //=====[Implementations of public functions]===================================
 
@@ -65,17 +75,15 @@ void feederInit(){
 }
 void feederUpdate() {
 
-    updateFeederTimeMode();
-
     switch(feederStatus){
         case FEEDER_MANUAL_MODE:{
-            //updateManualMode();
+            //----No hago nada
         }break;
         case FEEDER_FREE_MODE:{
-            
+            feederFreeModeUpdate();
         }break;
         case FEEDER_TIME_MODE:{
-            updateFeederTimeMode();
+            feederTimeModeUpdate();
         }
         default:{
 
@@ -126,9 +134,37 @@ switch(motorArray[0].read()){
 }
 #endif
 
+#ifdef _PROBANDO_PINES
+#define _PROBANDO_PINES
+//pruebas con leds
+    switch(motorArray[0].read()){
+        case DIRECTION_1:{
+            d1.write(ON);
+            d2.write(OFF);
+            s.write(OFF);
+
+            break;
+        }
+        case DIRECTION_2:{
+            d2.write(ON);
+            d1.write(OFF);
+            s.write(OFF);
+            break;
+        }
+        case STOPPED:{
+            s.write(ON);
+            d1.write(OFF);
+            d2.write(OFF);
+            break;
+        }
+    }
+#endif 
+
+
+
 #ifdef _PROBANDO_MODOS
 #define _PROBANDO_MODOS
-//pruebas con leds
+//pruebas con PINES
     switch(feederStatus){
         case FEEDER_MANUAL_MODE:{
             modomanual.write(ON);
@@ -150,6 +186,8 @@ switch(motorArray[0].read()){
         }
     }
 #endif 
+
+
 
 }
 
@@ -212,7 +250,7 @@ char* feederTimeRead(){
 
 
 
-void updateFeederTimeMode(){
+void feederTimeModeUpdate(){
 
     if(feederStatus!=FEEDER_TIME_MODE)
         return;
@@ -238,14 +276,14 @@ void updateFeederTimeMode(){
 }
 
 //Cambia el la direccion de los motores(el valor se actualiza al ejecutar la funcion feederUpdate())
-void updateManualMode(const char charReceived){
+void updateManualMode(const char receivedChar){
 
 
-    motorDirection_t d;
+    motorDirection_t d=STOPPED;
     if(feederStatus!=FEEDER_MANUAL_MODE){
         return;
     }
-    switch(charReceived){
+    switch(receivedChar){
         case 'z':case 'Z':  d=DIRECTION_1;  break;
         case 'x':case 'X':  d=STOPPED;  break;
         case 'c':case 'C':  d=DIRECTION_2;  break;
@@ -256,4 +294,38 @@ void updateManualMode(const char charReceived){
     }
 
 
+}
+
+void feederFreeModeUpdate(){
+    //Luego de haber esperado el delay de 2s freno los motores, si se llama devuelta al Init se reinicia el contador.
+    if(nonBlockingDelayRead(&freeModeDelay)==true){
+            for (int i = 0; i < 2; i++) {
+                 motorArray[i].write(STOPPED);
+            }   
+    }
+
+}
+void feederFreeModeInit(const char* uid){
+    if(!uid)
+        return;
+    if(feederStatus!=FEEDER_FREE_MODE)
+        return;
+    
+    printf("%s\n",uid);
+
+    if(validate_uid(uid)==true){
+
+        for (int i = 0; i < 2; i++) {
+            motorArray[i].write(DIRECTION_1);
+            nonBlockingDelayInit(&freeModeDelay,2000);
+        }
+
+    }
+    
+}
+
+bool validate_uid(const char* uid){
+    if(!strcmp(uid,"C3F3209B")||!strcmp(uid,"C7458501"))
+        return true;
+    return false;
 }

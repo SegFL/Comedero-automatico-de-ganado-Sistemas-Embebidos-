@@ -5,6 +5,13 @@
 
 
 //=====[Declaration of public defines]=========================================
+
+#define MOTOR1_PIN1 PF_12
+#define MOTOR1_PIN2 PF_13
+
+#define MOTOR2_PIN1 PF_14
+#define MOTOR2_PIN2 PF_15
+
 //=====[Declaration of public data types]======================================
 
 typedef enum {
@@ -27,7 +34,11 @@ void feederStatusWrite(feederStatus_t);
 char* feederTimeRead();
 void feederTimeSet( int year1, int month1, int day1, 
                        int hour1, int minute1, int second1, int duration);
-void updateManualMode(const char charReceived);
+void manualModeUpdate(char receivedChar);
+void feederFreeModeInit(const char* uid);
+
+
+
 
 //=====[#include guards - end]=================================================
 

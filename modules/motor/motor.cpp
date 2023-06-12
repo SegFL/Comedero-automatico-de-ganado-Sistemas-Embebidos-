@@ -17,8 +17,8 @@
 
 
 motor::motor(PinName pin1, PinName pin2)
-      : motorDirection(STOPPED), motorState(STOPPED), motorPin1(PF_2),
-        motorPin2(PE_3) {
+      : motorDirection(STOPPED), motorState(STOPPED), motorPin1(PF_12),
+        motorPin2(PF_13) {
 
 
 //motorState es la direccion que deberia tener el motor
@@ -54,14 +54,14 @@ void motor::change_state(motorDirection_t state) {
     if (motorDirection == DIRECTION_1) {
       motorPin2.input();
       motorPin1.output();
-      motorPin1 = LOW;
+      motorPin1 = HIGH;
       motorState = DIRECTION_1;
     }
 
     if (motorDirection == DIRECTION_2) {
       motorPin1.input();
       motorPin2.output();
-      motorPin2 = LOW;
+      motorPin2 = HIGH;
       motorState = DIRECTION_2;
     }
 }

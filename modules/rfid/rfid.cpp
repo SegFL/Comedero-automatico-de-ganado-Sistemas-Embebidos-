@@ -4,17 +4,14 @@
 #include "arm_book_lib.h"
 #include "non_blocking_delay.h"
 #include "rfid.h"
-
-#define RFID_MF_RESET PE_3
-#define RFID_SPI_MOSI PE_6
-#define RFID_SPI_MISO PE_5
-#define RFID_SPI_SCK PE_2
-#define RFID_SPI_CS PB_4        //chip select
+#include "string.h"
+#include "feeder.h"
 
 
-DigitalOut LedGreen(LED1);
-//Serial pc(USBTX,USBRX);
 
+
+
+//SPI DebugUART(UART_TX, UART_RX,115200);
 
 
 //private objects
@@ -22,10 +19,16 @@ static nonBlockingDelay_t rfid_delay;
 static rfidStatus_t rfidStatus=RFID_IDLE;
 
 
-MFRC522 RfChip(RFID_SPI_MOSI, RFID_SPI_MISO, RFID_SPI_SCK, RFID_SPI_CS, RFID_MF_RESET);
+MFRC522 RfChip(RFID_SPI_MOSI, RFID_SPI_MISO, RFID_SPI_SCLK, RFID_SPI_CS, RFID_MF_RESET);
 
 
+#ifdef _PROBANDO_RFID
+#define _PROBANDO_RFID
+DigitalOut LedGreen(LED1);
+DigitalOut LedBlue(LED2);
+DigitalOut LedRed(LED3);
 
+#endif
 
 void rfidInit(){
 
@@ -37,36 +40,23 @@ void rfidInit(){
 
 void rfidUpdate(){
 
-    if ( ! RfChip.PICC_IsNewCardPresent()){
 
-        LedGreen.write(OFF);
-/*
-        if(rfidStatus==RFID_IDLE){
-            nonBlockingDelayInit(&rfid_delay,500);
-            rfidStatus=RFID_READING_NEW_CARD;
-            return;
-        }
-        
-        if(rfidStatus==RFID_READING_NEW_CARD){
 
-            if(nonBlockingDelayRead(&rfid_delay)){
+	if ( ! RfChip.PICC_IsNewCardPresent()) {
+		return;
+	}
 
-            }
-        }
-            return;
-            */
-    }
-/*
-    
+	// Select one of the cards
+	if ( ! RfChip.PICC_ReadCardSerial()) {
+		return;
+	}
 
-    if ( ! RfChip.PICC_ReadCardSerial()){
-
-    }
-
-    for (uint8_t i = 0; i < RfChip.uid.size; i++){
-
-        printf(" %X02", RfChip.uid.uidByte[i]);
-        
-    */
+    char* buffer=(char*)calloc(21,sizeof(char));
+    for (uint8_t i = 0; i < RfChip.uid.size; i++)
+    {
+       sprintf(buffer+i*2,"%02X", RfChip.uid.uidByte[i]);
+    } 
+   feederFreeModeInit(buffer);
+    free(buffer);
 
 }
