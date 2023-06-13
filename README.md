@@ -26,3 +26,6 @@ Deberia cambiar oara que feeder set feede status arranque en modo apagado(deberi
 No deberia poder entrar a cambaiar el tiempo del feeder cuando no estoy en modo TIME MODE
 
 Implementar en feeder update como cambian los motores con cada modo y agregar a pcserial botones para controlar en modo manual los motores
+
+void feederTimeModeUpdate():
+    En la funcion al complir con el timepo de espera se setea de vuevlta el tiempo y se incrementa el dia en 1, que pasa si el dia es 31?Incrementa el mes?

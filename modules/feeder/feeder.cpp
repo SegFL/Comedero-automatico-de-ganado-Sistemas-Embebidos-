@@ -10,7 +10,7 @@
 #include "string.h"
 #include "non_blocking_delay.h"
 
-#include "time.h"
+#include <ctime>
 #include "date_and_time.h"
 
 
@@ -53,8 +53,11 @@ motor motorArray[] = {motor(MOTOR1_PIN1 , MOTOR1_PIN2), motor(MOTOR2_PIN1, MOTOR
 
 static feederStatus_t feederStatus;
 static nonBlockingDelay_t freeModeDelay;
+static nonBlockingDelay_t timeModeDelay;
 struct tm startTime;//tiempo de inicio del evento en TIME MODE
 int durationTime;
+bool feederTimeSatateSet = false;
+
 
 
 //=====[Declarations (prototypes) of private functions]========================
@@ -83,6 +86,8 @@ void feederUpdate() {
             feederFreeModeUpdate();
         }break;
         case FEEDER_TIME_MODE:{
+            if(feederTimeSatateSet==false)  //Si no setan un tiempo no hago nada
+                return;
             feederTimeModeUpdate();
         }
         default:{
@@ -216,6 +221,7 @@ void feederTimeSet( int year1, int month1, int day1,
     startTime.tm_isdst = -1;
 
     durationTime = duration;
+    feederTimeSatateSet=true;
 
 }
 
@@ -252,20 +258,30 @@ char* feederTimeRead(){
 
 void feederTimeModeUpdate(){
 
-    if(feederStatus!=FEEDER_TIME_MODE)
+    if(feederStatus!=FEEDER_TIME_MODE||feederTimeSatateSet==false)
         return;
-    struct tm date;
-    strftime(dateAndTimeRead(),50,"%Y-%m-%d %H:%M:%S",&date);
-    //printf("%f\n",difftime(mktime(&date),mktime(&startTime)));
 
-        if(difftime(mktime(&date),mktime(&startTime))<0){
-            
+    struct timeval date;
+    if(gettimeofday(&date, NULL))
+        printf("%s\n","error");
+    
+    printf("StartTime:%u\n",mktime(&startTime));
+    printf("Date:%u\n",date.tv_sec);
+    printf("Diff:%u\n",mktime(&startTime)-date.tv_sec);
+
+
+     if(date.tv_sec>mktime(&startTime)){
+             printf("%s\n","entre");
+            //Vuelvo a cargar el tiempo
+            startTime.tm_mday+=1;
+            nonBlockingDelayInit(&timeModeDelay,1000*durationTime);
+
+
             for (int i = 0; i < 2; i++) {
                 motorArray[i].write(DIRECTION_1);
-             }
-
-        }else{
-
+            }
+        }else if(nonBlockingDelayRead(&timeModeDelay)==true){
+             printf("%s\n","Termino el evento de time");
             for (int i = 0; i < 2; i++) {
                 motorArray[i].write(STOPPED);
             }
@@ -296,8 +312,9 @@ void manualModeUpdate(const char receivedChar){
 
 }
 
+ //Luego de haber esperado el delay de 2s freno los motores, si se llama devuelta al feederFreeModeInit se reinicia el contador.
 void feederFreeModeUpdate(){
-    //Luego de haber esperado el delay de 2s freno los motores, si se llama devuelta al Init se reinicia el contador.
+   
     if(nonBlockingDelayRead(&freeModeDelay)==true){
             for (int i = 0; i < 2; i++) {
                  motorArray[i].write(STOPPED);

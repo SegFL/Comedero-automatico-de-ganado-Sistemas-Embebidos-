@@ -27,6 +27,7 @@ char* dateAndTimeRead()
     return ctime(&epochSeconds);    
 }
 
+
 void dateAndTimeWrite( int year, int month, int day, 
                        int hour, int minute, int second )
 {
@@ -43,6 +44,8 @@ void dateAndTimeWrite( int year, int month, int day,
 
     set_time( mktime( &rtcTime ) );
 }
+
+
 
 //=====[Implementations of private functions]==================================
 
