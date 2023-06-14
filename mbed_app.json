@@ -1,0 +1,9 @@
+{
+ "target_overrides": {
+    "*": {
+    "platform.stdio-convert-newlines": 1,
+     "target.components_add": ["FATFileSystem"],
+    "target.printf_lib": "std"
+    }
+ }
+}

@@ -4,6 +4,7 @@
 #include "arm_book_lib.h"
 
 #include "pc_serial_com.h"
+#include "log.h"
 
 
 
@@ -122,7 +123,6 @@ void pcSerialComUpdate()
             case PC_SERIAL_SETTING_FEEDER_TIME:
                 commandSetFeederTime(receivedChar);
                 break;
-
             default:
                 pcSerialComMode = PC_SERIAL_COMMANDS;
                 break;
@@ -155,6 +155,7 @@ static void pcSerialComCommandUpdate( char receivedChar )
         case '4': commandSetDateAndTime('\0'); break;
         case '5': commandSetFeederTime('\0');break;
         case '6': commandShowFeederTime();break;
+        case '7': logRead();break;
         case 'z': case 'x':case 'c':case 'Z':case 'X':case 'C': manualModeUpdate(receivedChar);break;
         
         default: availableCommands(); break;
@@ -170,6 +171,7 @@ static void availableCommands(){
     pcSerialComStringWrite( "Press '4' SetDateAndTime\r\n" );
     pcSerialComStringWrite( "Press '5' SetFeederTime\r\n" );
     pcSerialComStringWrite( "Press '6' GetFeederTime\r\n" );
+    pcSerialComStringWrite( "Press '7' ShowLog\r\n" );
     pcSerialComStringWrite( "Press 'Z','X','C' to move de motors (ONLY IN MANUAL MODE)\r\n" );
 
 

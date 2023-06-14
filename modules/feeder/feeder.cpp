@@ -9,9 +9,11 @@
 #include "stdlib.h"
 #include "string.h"
 #include "non_blocking_delay.h"
+#include "log.h"
 
-#include <ctime>
 #include "date_and_time.h"
+#include "stdio.h"
+#include "aux_functions.h"
 
 
 #define _PROBANDO_MOTORES
@@ -38,7 +40,19 @@ DigitalOut motor1der(LED3);
 
 //=====[Declaration of private data types]=====================================
 
+//estructura que lleva un registro de quien y cuando se activo un motor
+typedef struct{
+    struct timeval initTime;
+    feederStatus_t feederStatus;
+    char* uid;
+    bool state=false;
+}motor_info_t;
 
+typedef struct{
+    struct timeval counter;
+    char* uid;
+   // bool state=false;
+}feeder_info_t;
 
 //=====[Declaration and initialization of public global objects]===============
 
@@ -57,16 +71,18 @@ static nonBlockingDelay_t timeModeDelay;
 struct tm startTime;//tiempo de inicio del evento en TIME MODE
 int durationTime;
 bool feederTimeSatateSet = false;
-
+static motor_info_t motor_info[2];
 
 
 //=====[Declarations (prototypes) of private functions]========================
 
 
-static bool validate_uid(const char* uid);
+static bool validateUid(const char* uid);
 
 static void feederTimeModeUpdate();
 static void feederFreeModeUpdate();
+static void motorInfoInit(motor_info_t* d,const char*uid);
+static void motorInfoEnd(motor_info_t* d);
 
 
 //=====[Implementations of public functions]===================================
@@ -94,6 +110,8 @@ void feederUpdate() {
 
         }
     }
+
+
     for (int i = 0; i < 2; i++) {
       switch (motorArray[i].read_state()) {
         case DIRECTION_1:
@@ -112,6 +130,8 @@ void feederUpdate() {
         default:
             if (motorArray[i].read() == DIRECTION_1) {
                 motorArray[i].change_state(DIRECTION_1);
+                
+
             }else if (motorArray[i].read() == DIRECTION_2) {
                 motorArray[i].change_state(DIRECTION_2);
             }
@@ -243,7 +263,7 @@ char* feederTimeRead(){
         return NULL;
     }
 
-    strcpy(cadena, asctime(&startTime));
+    cadena=strndup( asctime(&startTime),20);
     strcat(cadena, "Duration:");
     sprintf(buffer, "%d", durationTime);
     strcat(cadena, buffer);
@@ -265,13 +285,13 @@ void feederTimeModeUpdate(){
     if(gettimeofday(&date, NULL))
         printf("%s\n","error");
     
-    printf("StartTime:%u\n",mktime(&startTime));
-    printf("Date:%u\n",date.tv_sec);
-    printf("Diff:%u\n",mktime(&startTime)-date.tv_sec);
+    //printf("StartTime:%u\n",mktime(&startTime));
+   // printf("Date:%u\n",date.tv_sec);
+    //printf("Diff:%u\n",mktime(&startTime)-date.tv_sec);
 
 
      if(date.tv_sec>mktime(&startTime)){
-             printf("%s\n","entre");
+            // printf("%s\n","entre");
             //Vuelvo a cargar el tiempo
             startTime.tm_mday+=1;
             nonBlockingDelayInit(&timeModeDelay,1000*durationTime);
@@ -312,37 +332,100 @@ void manualModeUpdate(const char receivedChar){
 
 }
 
- //Luego de haber esperado el delay de 2s freno los motores, si se llama devuelta al feederFreeModeInit se reinicia el contador.
+ //Luego de haber esperado el delay de 1s freno los motores, si se llama devuelta al feederFreeModeInit se reinicia el contador.
 void feederFreeModeUpdate(){
+
+    if(feederStatus!=FEEDER_FREE_MODE)
+        return;
    
     if(nonBlockingDelayRead(&freeModeDelay)==true){
             for (int i = 0; i < 2; i++) {
                  motorArray[i].write(STOPPED);
-            }   
+                 if(motor_info[i].state==true){
+                     motorInfoEnd(&motor_info[i]);
+                }
+                 
+            }  
+
     }
 
 }
+//uid es el identificador unico RFID
 void feederFreeModeInit(const char* uid){
     if(!uid)
         return;
     if(feederStatus!=FEEDER_FREE_MODE)
         return;
     
-    printf("%s\n",uid);
+    //printf("%s\n",uid);
 
-    if(validate_uid(uid)==true){
+    if(validateUid(uid)==true){
+
+        //Me fijo si tengo que prender el motor
 
         for (int i = 0; i < 2; i++) {
             motorArray[i].write(DIRECTION_1);
+            //Escribo en que momento se encendio el motor y con que uid
+            motorInfoInit(&motor_info[i],uid);
         }
-        nonBlockingDelayInit(&freeModeDelay,2000);
+        nonBlockingDelayInit(&freeModeDelay,1000);
 
     }
     
 }
 
-bool validate_uid(const char* uid){
+ void motorInfoInit(motor_info_t* d,const char*uid){
+    if(!d||!uid)
+       return;
+    if(d->state==true)//Si ya esta inicializado no hago nada
+        return;
+    struct timeval date;
+    gettimeofday(&date, NULL);
+    d->initTime=date;
+    free(d->uid);
+    d->uid=strndup(uid,10);
+    d->state=true;
+ }
+ static void motorInfoEnd(motor_info_t* d){
+     if(!d)
+        return;
+    if(d->state==false)
+            return;
+    struct timeval date;
+    gettimeofday(&date, NULL);
+    //printf("%s:%d\n",d->uid,date.tv_sec-d->initTime.tv_sec);
+//resto el tiempo en el cual se incio y el tiempo final
+    logWrite(d->uid,date.tv_sec-d->initTime.tv_sec);
+    free(d->uid);
+    d->uid=NULL;
+    d->state=false;
+    
+
+ }
+
+
+
+
+
+
+bool validateUid(const char* uid){
     if(!strcmp(uid,"C3F3209B")||!strcmp(uid,"C7458501"))
         return true;
     return false;
 }
+
+/*
+bool feederAddEntry(const char* uid){
+    if(!uid)
+        return false;
+    //busco en el archivo(deberia llamar a validate_uid)
+
+    //abrir archivo
+
+    //escribir
+
+    //cerrar
+
+
+}
+*/
