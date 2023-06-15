@@ -35,7 +35,7 @@ char* feederTimeRead();
 void feederTimeSet( int year1, int month1, int day1, 
                        int hour1, int minute1, int second1, int duration);
 void manualModeUpdate(char receivedChar);
-void feederFreeModeInit(const char* uid);
+bool feederFreeModeInit(char* uid);
 
 
 

@@ -5,6 +5,7 @@
 
 #include "pc_serial_com.h"
 #include "log.h"
+#include "rfid.h"
 
 
 
@@ -21,7 +22,8 @@ typedef enum{
     PC_SERIAL_COMMANDS,
     PC_SERIAL_SETTING_DATE,
     PC_SERIAL_SETTING_FEEDER_STATUS,
-    PC_SERIAL_SETTING_FEEDER_TIME
+    PC_SERIAL_SETTING_FEEDER_TIME,
+    PC_SERIAL_LOADING_NEW_UID
 } pcSerialComMode_t;
 
 
@@ -83,6 +85,7 @@ static void commandShowFeederTime();
 
 static void commandSetDateAndTime(const char receivedChar);
 static void commandShowDateAndTime();
+static void commandLoadUid();
 
 
 //=====[Implementations of public functions]===================================
@@ -123,6 +126,8 @@ void pcSerialComUpdate()
             case PC_SERIAL_SETTING_FEEDER_TIME:
                 commandSetFeederTime(receivedChar);
                 break;
+            case PC_SERIAL_LOADING_NEW_UID:
+                commandLoadUid();
             default:
                 pcSerialComMode = PC_SERIAL_COMMANDS;
                 break;
@@ -156,6 +161,7 @@ static void pcSerialComCommandUpdate( char receivedChar )
         case '5': commandSetFeederTime('\0');break;
         case '6': commandShowFeederTime();break;
         case '7': logRead();break;
+        case '8': commandLoadUid();break;
         case 'z': case 'x':case 'c':case 'Z':case 'X':case 'C': manualModeUpdate(receivedChar);break;
         
         default: availableCommands(); break;
@@ -172,6 +178,7 @@ static void availableCommands(){
     pcSerialComStringWrite( "Press '5' SetFeederTime\r\n" );
     pcSerialComStringWrite( "Press '6' GetFeederTime\r\n" );
     pcSerialComStringWrite( "Press '7' ShowLog\r\n" );
+    pcSerialComStringWrite( "Press '8' Add Entry To Log\r\n" );
     pcSerialComStringWrite( "Press 'Z','X','C' to move de motors (ONLY IN MANUAL MODE)\r\n" );
 
 
@@ -530,3 +537,20 @@ static void commandShowFeederTime()
     pcSerialComStringWrite( str );
     pcSerialComStringWrite("\r\n");
 }
+static void commandLoadUid(){
+
+    char * aux=rfidGetUid();
+
+    if(!aux)
+        return;
+
+    if(logAdd(aux)==false){
+
+    }
+        pcSerialComStringWrite("\r\nNew UID loaded ");
+        free(aux);
+
+
+}
+
+

@@ -5,20 +5,16 @@
 #include "non_blocking_delay.h"
 #include "rfid.h"
 #include "string.h"
+#include "aux_functions.h"
 #include "feeder.h"
 
-
-
-
-
-//SPI DebugUART(UART_TX, UART_RX,115200);
 
 
 //private objects
 static nonBlockingDelay_t rfid_delay;
 static rfidStatus_t rfidStatus=RFID_IDLE;
 
-
+char buffer[20]={'\0'};
 MFRC522 RfChip(RFID_SPI_MOSI, RFID_SPI_MISO, RFID_SPI_SCLK, RFID_SPI_CS, RFID_MF_RESET);
 
 
@@ -40,23 +36,47 @@ void rfidInit(){
 
 void rfidUpdate(){
 
+    switch(rfidStatus){
+        case RFID_IDLE:{
+            if ( ! RfChip.PICC_IsNewCardPresent()) 
+		        return;
+            rfidStatus=RFID_READING_NEW_CARD;
+	        break;
+        }
+        case RFID_READING_NEW_CARD:{
+            // Select one of the cards
+            if ( ! RfChip.PICC_ReadCardSerial()) {
+                return;
+	        }     
+            for (uint8_t i = 0; i < RfChip.uid.size; i++)
+            {
+                 sprintf(buffer+i*2,"%02X", RfChip.uid.uidByte[i]);
+            } 
+            rfidStatus=RFID_VALID_CARD;
+            break;
+        }
+        case RFID_VALID_CARD:{
+            char* aux=strndup(buffer,10);
+             if(feederFreeModeInit(buffer)==true){//Si el modulo del feeder acepta el uid lo descarto
+                 rfidStatus=RFID_IDLE;
 
+             }
+            break;
+        }
 
-	if ( ! RfChip.PICC_IsNewCardPresent()) {
-		return;
-	}
-
-	// Select one of the cards
-	if ( ! RfChip.PICC_ReadCardSerial()) {
-		return;
-	}
-
-    char* buffer=(char*)calloc(21,sizeof(char));
-    for (uint8_t i = 0; i < RfChip.uid.size; i++)
-    {
-       sprintf(buffer+i*2,"%02X", RfChip.uid.uidByte[i]);
-    } 
-   feederFreeModeInit(buffer);
-    free(buffer);
+        }
 
 }
+//Se supone que borran la memoria
+char* rfidGetUid(){
+
+    if(rfidStatus!=RFID_VALID_CARD)
+        return NULL;
+
+    char* aux=strndup(buffer,10);
+    buffer[0]={'\0'};
+    rfidStatus=RFID_IDLE;//Ya procese el uid ingresado a si que vuelvo a modo de esepra
+    return aux;
+
+}
+

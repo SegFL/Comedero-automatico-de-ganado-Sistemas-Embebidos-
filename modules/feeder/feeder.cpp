@@ -351,11 +351,14 @@ void feederFreeModeUpdate(){
 
 }
 //uid es el identificador unico RFID
-void feederFreeModeInit(const char* uid){
+bool feederFreeModeInit(char* uid){
     if(!uid)
-        return;
-    if(feederStatus!=FEEDER_FREE_MODE)
-        return;
+        return false;
+    if(feederStatus!=FEEDER_FREE_MODE){
+        free(uid);
+        return false;
+    }
+
     
     //printf("%s\n",uid);
 
@@ -369,8 +372,12 @@ void feederFreeModeInit(const char* uid){
             motorInfoInit(&motor_info[i],uid);
         }
         nonBlockingDelayInit(&freeModeDelay,1000);
+        free(uid);
+        return true;
 
     }
+    free(uid);
+    return false;
     
 }
 

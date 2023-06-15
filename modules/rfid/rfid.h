@@ -24,5 +24,6 @@ typedef enum{
 //=====[Declarations (prototypes) of public functions]=========================
 void rfidUpdate();
 void rfidInit();
+char* rfidGetUid();
 //=====[#include guards - end]=================================================
 #endif // _RFID_H_
