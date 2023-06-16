@@ -63,7 +63,7 @@ UnbufferedSerial uartUsb(USBTX, USBRX, 115200);
 //=====[Declaration and initialization of private global variables]============
 
 static pcSerialComMode_t pcSerialComMode = PC_SERIAL_COMMANDS;
-
+static int feederManualModeDirection =0;
 //Variable que utiliza pcSerialComCommandUpdate para saber si se esta actualizando el dia y la hora
 static bool settingDateAndTimer=false;
 setting_date_and_time_status_t date_and_time_status = SETTING_DESACTIVATE;
@@ -80,6 +80,8 @@ static void commandShowCurrentFeederStatus();
 static void commandSetFeederStatus(const char receivedChar);
 static void commandSetFeederTime(const char receivedChar);
 static void commandShowFeederTime();
+
+static void commandSetFeederDirection(char receivedChar);
 
 
 
@@ -127,7 +129,7 @@ void pcSerialComUpdate()
                 commandSetFeederTime(receivedChar);
                 break;
             case PC_SERIAL_LOADING_NEW_UID:
-                commandLoadUid();
+                 break;
             default:
                 pcSerialComMode = PC_SERIAL_COMMANDS;
                 break;
@@ -162,10 +164,35 @@ static void pcSerialComCommandUpdate( char receivedChar )
         case '6': commandShowFeederTime();break;
         case '7': logRead();break;
         case '8': commandLoadUid();break;
-        case 'z': case 'x':case 'c':case 'Z':case 'X':case 'C': manualModeUpdate(receivedChar);break;
+        case 'z': case 'x':case 'c':case 'Z':case 'X':case 'C': commandSetFeederDirection(receivedChar);break;
         
         default: availableCommands(); break;
     } 
+}
+
+int commandGetFeederDirection(){
+    return feederManualModeDirection;
+}
+void commandSetFeederDirection(char receivedChar){
+
+    switch(receivedChar){
+        case 'z':  case 'Z': {
+            feederManualModeDirection=-1;
+            break;
+        }
+        case 'c':  case 'C': {
+           feederManualModeDirection=1;
+            break;
+        }
+        case 'x':  case 'X': {
+            feederManualModeDirection=0;
+            break;
+        }
+        default:
+            break;
+
+    }
+
 }
 
 static void availableCommands(){
@@ -509,8 +536,12 @@ static void commandSetFeederTime(const char receivedChar){
                 if (indice == 2) {
                     dat.second[2] = '\0';
                     indice = 0;
-		    feederTimeSet(atoi(dat.year), atoi(dat.month), atoi(dat.day), atoi  (dat.hour),
-                atoi(dat.minute), atoi(dat.second),atoi(dat.duration));
+		            if(feederTimeSet(atoi(dat.year), atoi(dat.month), atoi(dat.day), atoi  (dat.hour),
+                     atoi(dat.minute), atoi(dat.second),atoi(dat.duration))==false){
+                     pcSerialComStringWrite("\r\n");
+                    pcSerialComStringWrite(" The time is invalid\r\n");
+                    commandShowFeederTime();
+                     }
                     pcSerialComStringWrite("\r\n");
                     pcSerialComStringWrite(" The time and duaration has been set\r\n");
                     commandShowFeederTime();
@@ -539,18 +570,28 @@ static void commandShowFeederTime()
 }
 static void commandLoadUid(){
 
+    pcSerialComMode=PC_SERIAL_LOADING_NEW_UID;
+
+/*
     char * aux=rfidGetUid();
 
     if(!aux)
         return;
 
     if(logAdd(aux)==false){
+        pcSerialComStringWrite("\r\nInvalid UID ");
+        free(aux);
+        return;
 
     }
         pcSerialComStringWrite("\r\nNew UID loaded ");
         free(aux);
 
-
+*/
 }
 
+bool pcSerialComStateNewUid(){
 
+    return pcSerialComMode==PC_SERIAL_LOADING_NEW_UID?true:false;
+
+}

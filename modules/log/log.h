@@ -5,3 +5,4 @@ void logUpdate(const char*uid);
 void logWrite(const char* uid,int duracion);
 void logRead();
 bool logAdd(char*uid);
+bool logExist(const char* uid);

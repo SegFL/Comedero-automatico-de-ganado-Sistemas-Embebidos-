@@ -12,11 +12,7 @@
 #define RFID_SPI_CS PD_14      //chip select
 //=====[Declaration of public data types]======================================
 
-typedef enum{
-    RFID_IDLE,
-    RFID_READING_NEW_CARD,
-    RFID_VALID_CARD
-} rfidStatus_t;
+
 
 
 

@@ -28,11 +28,15 @@ No deberia poder entrar a cambaiar el tiempo del feeder cuando no estoy en modo 
 Implementar en feeder update como cambian los motores con cada modo y agregar a pcserial botones para controlar en modo manual los motores
 
 void feederTimeModeUpdate():
-    En la funcion al complir con el timepo de espera se setea de vuevlta el tiempo y se incrementa el dia en 1, que pasa si el dia es 31?Incrementa el mes?
+    En la funcion al complir con el timepo de espera se setea de vuevlta el tiempo y se incrementa el dia en 1, que pasa si el dia es 31?Incrementa el mes?Se puede soluciona haciendo algo parecido al ejemplo 112 del libro
 
+
+Deberia cambianr los printf por pcSerialComStringWrite()
 
 
 Problemas de implementacion:
     Tengo un solo lector RFID por lo que no puedo diferenciar que motor tengo que prender. O sea por una entrada en el mismo modulo RFID prendo 2 motores, no tendria mucho sentido.Que hago? No le doy bola y uso un solo modulo, controlo los 2 motores o saco 1?
 
     Probelmas al abrir el archvio log, hay que configurar algo por fuera del programa?
+
+

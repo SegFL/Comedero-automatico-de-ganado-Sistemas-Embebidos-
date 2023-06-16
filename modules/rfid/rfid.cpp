@@ -9,12 +9,19 @@
 #include "feeder.h"
 
 
+typedef enum{
+    RFID_IDLE,
+    RFID_READING_NEW_CARD,
+    RFID_VALID_CARD
+} rfidStatus_t;
+
+
 
 //private objects
 static nonBlockingDelay_t rfid_delay;
 static rfidStatus_t rfidStatus=RFID_IDLE;
 
-char buffer[20]={'\0'};
+static char buffer[20]={'\0'};
 MFRC522 RfChip(RFID_SPI_MOSI, RFID_SPI_MISO, RFID_SPI_SCLK, RFID_SPI_CS, RFID_MF_RESET);
 
 
@@ -52,24 +59,22 @@ void rfidUpdate(){
             {
                  sprintf(buffer+i*2,"%02X", RfChip.uid.uidByte[i]);
             } 
+            printf("%s\n",buffer);
             rfidStatus=RFID_VALID_CARD;
             break;
         }
         case RFID_VALID_CARD:{
-            char* aux=strndup(buffer,10);
-             if(feederFreeModeInit(buffer)==true){//Si el modulo del feeder acepta el uid lo descarto
-                 rfidStatus=RFID_IDLE;
-
-             }
-            break;
+            puts("Tengo una entrada valida");
+            break;//Se queda esperando a que alguien lea el neuvo uid
         }
 
-        }
+    }
 
 }
 //Se supone que borran la memoria
 char* rfidGetUid(){
 
+    return NULL;
     if(rfidStatus!=RFID_VALID_CARD)
         return NULL;
 

@@ -17,7 +17,8 @@
 typedef enum {
     FEEDER_MANUAL_MODE,
     FEEDER_FREE_MODE,
-    FEEDER_TIME_MODE
+    FEEDER_TIME_MODE,
+    FEEDER_NEW_UID
 } feederStatus_t;
 
 
@@ -31,11 +32,14 @@ void feederUpdate();
 feederStatus_t feederStatusRead();
 void feederStatusWrite(feederStatus_t);
 
+//Time
 char* feederTimeRead();
-void feederTimeSet( int year1, int month1, int day1, 
+bool feederTimeSet( int year1, int month1, int day1, 
                        int hour1, int minute1, int second1, int duration);
-void manualModeUpdate(char receivedChar);
-bool feederFreeModeInit(char* uid);
+//Manual
+int feederManualModeRead();
+//Free
+//bool feederFreeModeInit(char* uid);
 
 
 
