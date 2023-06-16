@@ -46,8 +46,8 @@ void logRead(){
 
     }
 
-    for(int i=0;i<2;i++){
-        printf("UID:%s %d\n",data_vector[i]->uid, data_vector[i]->duracion);
+    for(int i=0;i<cantidad;i++){
+        printf("\n\rUID:%s %d\n",data_vector[i]->uid, data_vector[i]->duracion);
     }
 
 }
@@ -71,9 +71,9 @@ void logWrite(const char* uid,int duracion){
 
 bool logAdd(char*uid){
 
-    if(!uid||!data_vector)
+    if(!uid)
         return false;
-    puts("entre a logAdd con algo no nulo");
+    //printf("%s\n",uid);
     
     data_t* data_aux=(data_t*)calloc(1,sizeof(data_t));
     if(!data_aux)
@@ -82,6 +82,7 @@ bool logAdd(char*uid){
         free(data_aux);
         return false;
     }
+    printf(" \nse copia : %s\n",data_aux->uid);
     data_t** vector_aux=(data_t**)realloc(data_vector,sizeof(data_t*)*(cantidad+1));
     if(!vector_aux){
         free(data_aux->uid);
@@ -89,8 +90,10 @@ bool logAdd(char*uid){
         return false;  
     }
     data_vector=vector_aux;
-    data_vector[cantidad+1]=data_aux;
+    data_vector[cantidad]=data_aux;
     cantidad++;
+
+    printf("Nuevo uid agregado %s\n",data_vector[cantidad -1]->uid);
     return true;
 
     

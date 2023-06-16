@@ -8,14 +8,11 @@
 #include "aux_functions.h"
 #include "feeder.h"
 
-
 typedef enum{
     RFID_IDLE,
     RFID_READING_NEW_CARD,
     RFID_VALID_CARD
 } rfidStatus_t;
-
-
 
 //private objects
 static nonBlockingDelay_t rfid_delay;
@@ -52,29 +49,27 @@ void rfidUpdate(){
         }
         case RFID_READING_NEW_CARD:{
             // Select one of the cards
-            if ( ! RfChip.PICC_ReadCardSerial()) {
+            if ( RfChip.PICC_ReadCardSerial()==false) {
                 return;
 	        }     
             for (uint8_t i = 0; i < RfChip.uid.size; i++)
             {
                  sprintf(buffer+i*2,"%02X", RfChip.uid.uidByte[i]);
             } 
-            printf("%s\n",buffer);
             rfidStatus=RFID_VALID_CARD;
             break;
         }
         case RFID_VALID_CARD:{
-            puts("Tengo una entrada valida");
-            break;//Se queda esperando a que alguien lea el neuvo uid
+
+           // puts("tengo una uid valida");
+            break;
         }
 
-    }
+        }
 
 }
 //Se supone que borran la memoria
 char* rfidGetUid(){
-
-    return NULL;
     if(rfidStatus!=RFID_VALID_CARD)
         return NULL;
 
@@ -84,4 +79,3 @@ char* rfidGetUid(){
     return aux;
 
 }
-

@@ -111,14 +111,21 @@ void feederUpdate() {
             feederTimeModeUpdate();
         }
         case FEEDER_NEW_UID:{
-            
-            if(logAdd(rfidGetUid())==true){
-                feederStatus=previousState;
+            //if(logAdd(rfidGetUid())==true){
+            char* uid=rfidGetUid();
+            if(uid){
+                //printf("En el feeder llega :%s\n",uid);
+                if(logAdd(uid)==true){
+                    printf("New tag introduced:%s\n",uid);
+                    free(uid);
+                    feederStatus=previousState;
+                }
+                    
             }
 
             break;   
         }
-        default:{break; }
+        default:{break;}
     }
     //Me fijo si tengo que cambiar el estado a FEEDER_NEW_UID
     if( pcSerialComStateNewUid()==true){

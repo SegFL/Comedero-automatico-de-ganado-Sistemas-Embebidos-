@@ -129,6 +129,7 @@ void pcSerialComUpdate()
                 commandSetFeederTime(receivedChar);
                 break;
             case PC_SERIAL_LOADING_NEW_UID:
+                commandLoadUid();
                  break;
             default:
                 pcSerialComMode = PC_SERIAL_COMMANDS;
@@ -570,24 +571,15 @@ static void commandShowFeederTime()
 }
 static void commandLoadUid(){
 
-    pcSerialComMode=PC_SERIAL_LOADING_NEW_UID;
+    if(pcSerialComMode!=PC_SERIAL_LOADING_NEW_UID){
 
-/*
-    char * aux=rfidGetUid();
-
-    if(!aux)
-        return;
-
-    if(logAdd(aux)==false){
-        pcSerialComStringWrite("\r\nInvalid UID ");
-        free(aux);
-        return;
-
+        pcSerialComMode=PC_SERIAL_LOADING_NEW_UID;
+        pcSerialComStringWrite("\r\nIntrudce a new RFID tag");
+    }else{
+        pcSerialComMode=PC_SERIAL_COMMANDS;         
+        pcSerialComStringWrite("\r\nFinished introducing new tags ");
     }
-        pcSerialComStringWrite("\r\nNew UID loaded ");
-        free(aux);
-
-*/
+    
 }
 
 bool pcSerialComStateNewUid(){
