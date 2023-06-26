@@ -4,6 +4,9 @@
 #include "pc_serial_com.h"
 #include "rfid.h"
 #include "log.h"
+#include "ble_com.h"
+#include "main_system.h"
+#include "non_blocking_delay.h"
 //=====[Declaration of private defines]========================================
 
 
@@ -13,7 +16,7 @@
 //=====[Declaration and initialization of public global objects]===============
 
 
-
+static nonBlockingDelay_t mainDelay;
 //=====[Declaration of external public global variables]=======================
 
 //=====[Declaration and initialization of public global variables]=============
@@ -30,19 +33,20 @@ void mainSystemInit()
     pcSerialComInit();
     rfidInit();
     logInit();
-  //nonBlockingDelayInit( &mainSystemDelay, SYSTEM_TIME_INCREMENT_MS );
+  nonBlockingDelayInit( &mainDelay, SYSTEM_TIME_INCREMENT_MS );
 
 }
 
 void mainSystemUpdate()
 {
    
-
-    feederUpdate();
-    pcSerialComUpdate();
-    rfidUpdate();
-
-
+    if(nonBlockingDelayRead(&mainDelay)==true){
+        feederUpdate();
+        pcSerialComUpdate();
+        rfidUpdate();
+        nonBlockingDelayInit(&mainDelay,SYSTEM_TIME_INCREMENT_MS);
+    }
+    bleComUpdate();
 }
 
 //=====[Implementations of private functions]==================================

@@ -1,18 +1,20 @@
 //=====[#include guards - begin]===============================================
 
-#ifndef _MAIN_SYSTEM_H_
-#define _MAIN_SYSTEM_H_
+#ifndef _BLE_COM_H_
+#define _BLE_COM_H_
 
 
+#define SERVER_UUID 454fe39b-0cda-4836-b15d-1b9953faeefc
+#define CARACTERISTIC_UUID 51c99e2a-7369-4f98-b4c4-e9b376e4e889
 //=====[Declaration of public defines]=========================================
-#define SYSTEM_TIME_INCREMENT_MS 5
+
 //=====[Declaration of public data types]======================================
 
 //=====[Declarations (prototypes) of public functions]=========================
 
-void mainSystemInit();
-void mainSystemUpdate();
+void bleComUpdate();
+void bleComStringWrite( const char* str );
 
 //=====[#include guards - end]=================================================
 
-#endif 
+#endif // _BLE_COM_H_

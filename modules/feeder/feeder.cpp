@@ -18,7 +18,7 @@
 #include "aux_functions.h"
 
 
-#define _PROBANDO_MOTORES
+
 
 
 #ifdef _PROBANDO_PINES
