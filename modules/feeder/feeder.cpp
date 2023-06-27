@@ -125,17 +125,18 @@ void feederUpdate() {
                     printf("This UID already exist :%s\n",uid);
                 }else if(logAdd(uid)==true){
                     printf("New tag introduced:%s\n",uid);
-                   // feederStatus=previousState;
+                   
                 }else{printf("Error introducing :%s\n",uid);}
             }
-            feederStatus=FEEDER_MANUAL_MODE;
             free(uid);
+            feederStatus=FEEDER_MANUAL_MODE;
         }break;   
         default:{break;}
     }
     //Me fijo si tengo que cambiar el estado a FEEDER_NEW_UID
     if( pcSerialComStateNewUid()==true){
-    feederStatus=FEEDER_NEW_UID;
+        previousState=feederStatus;
+        feederStatus=FEEDER_NEW_UID;
     }
 //Actualizo los motores al estado que corresponda
     for (int i = 0; i < 2; i++) {
