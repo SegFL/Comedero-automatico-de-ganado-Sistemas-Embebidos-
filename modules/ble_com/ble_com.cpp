@@ -10,7 +10,7 @@
 #include "mbed.h"
 
 
-#define _PROBANDO_BLE
+
 
 #ifdef _PROBANDO_BLE
 DigitalOut z1(LED1);
@@ -21,6 +21,9 @@ DigitalOut z3(LED3);
 //=====[Declaration of private defines]========================================
 
 //=====[Declaration of private data types]=====================================
+
+
+
 
 //=====[Declaration and initialization of public global objects]===============
 
@@ -34,7 +37,6 @@ UnbufferedSerial uartBle(PD_5, PD_6, 9600);
 
 //=====[Declarations (prototypes) of private functions]========================
 
-static char bleComCharRead();
 
 
 //=====[Implementations of public functions]===================================
@@ -43,9 +45,10 @@ void bleComUpdate()
 {
     static int g=0;
     char buff[]={'\0'};
-    char receivedChar = bleComCharRead();
+/*    char receivedChar = bleComCharRead();
     if( receivedChar != '\0' ) {
-        buff[0]=receivedChar;
+
+
             switch(receivedChar){
                 case 'a':case 'A':case 1:{
                     bleComStringWrite(buff);
@@ -63,15 +66,11 @@ void bleComUpdate()
                     z2.write(OFF);
                     z3.write(OFF);
                     break;
-                }
-                default:
-                    z3.write(ON);
-                    break;
-            }
+                  }      
         
-    }
-    bleComStringWrite(dateAndTimeRead());
 
+        }
+    }*/
 }
 
 void bleComStringWrite( const char* str )
@@ -81,7 +80,7 @@ void bleComStringWrite( const char* str )
 
 //=====[Implementations of private functions]==================================
 
-static char bleComCharRead()
+char bleComCharRead()
 {
     char receivedChar = '\0';
     if( uartBle.readable() ) {
@@ -89,4 +88,7 @@ static char bleComCharRead()
     }
     return receivedChar;
 }
+
+
+
 

@@ -1,7 +1,7 @@
 //=====[#include guards - begin]===============================================
 
-#ifndef _BLE_COM_H_
-#define _BLE_COM_H_
+#ifndef _PC_SERIAL_COM_H_
+#define _PC_SERIAL_COM_H_
 
 //=====[Declaration of public defines]=========================================
 
@@ -9,11 +9,13 @@
 
 //=====[Declarations (prototypes) of public functions]=========================
 
-void bleComUpdate();
-void bleComStringWrite( const char* str );
-
-char bleComCharRead();
+void userInterfaceInit();
+char userInterfaceCharRead();
+void userInterfaceStringWrite( const char* str );
+void userInterfaceUpdate();
+bool userInterfaceStateNewUid();
+int commandGetFeederDirection();
 
 //=====[#include guards - end]=================================================
 
-#endif // _BLE_COM_H_
+#endif // _PC_SERIAL_COM_H_

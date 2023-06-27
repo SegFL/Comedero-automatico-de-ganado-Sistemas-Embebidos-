@@ -18,7 +18,7 @@
 #include "aux_functions.h"
 
 
-
+#define _PROBANDO_MOTORES
 
 
 #ifdef _PROBANDO_PINES
@@ -309,7 +309,7 @@ char* feederTimeRead(){
     sprintf(buffer, "%d", durationTime);
     strcat(cadena, buffer);
 
-    free(buffer); // Liberamos la memoria asignada para el buffer
+    free(buffer); // libreo la memoria asignada para el buffer
 
     return cadena;
 

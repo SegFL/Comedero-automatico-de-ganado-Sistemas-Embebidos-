@@ -6,16 +6,15 @@
 #include "pc_serial_com.h"
 #include "log.h"
 #include "rfid.h"
-
-
-
-
-
+#include "ble_com.h"
 #include "feeder.h"
 #include "date_and_time.h"
 
+
+
 //=====[Declaration of private defines]========================================
 
+#define INTERFAZ_BLE
 //=====[Declaration of private data types]=====================================
 
 typedef enum{
@@ -100,15 +99,36 @@ void pcSerialComInit()
 char pcSerialComCharRead()
 {
     char receivedChar = '\0';
+
+    #ifdef INTERFAZ_PC
+
     if( uartUsb.readable() ) {
         uartUsb.read( &receivedChar, 1 );
     }
+    #endif
+
+    #ifdef INTERFAZ_BLE
+    
+
+        receivedChar = bleComCharRead();
+    
+
+    #endif
     return receivedChar;
 }
 
 void pcSerialComStringWrite( const char* str )
 {
+    
+
+    #ifdef INTERFAZ_PC
     uartUsb.write( str, strlen(str) );
+    #endif
+
+    #ifdef INTERFAZ_BLE
+    bleComStringWrite(str);
+    uartUsb.write( str, strlen(str) );
+    #endif
 }
 
 void pcSerialComUpdate()
@@ -157,14 +177,14 @@ static void pcSerialComStringRead( char* str, int strLength )
 static void pcSerialComCommandUpdate( char receivedChar )
 {
     switch (receivedChar) {
-        case '1': commandShowCurrentFeederStatus(); break;
-        case '2': commandSetFeederStatus('\0'); break;
-        case '3': commandShowDateAndTime(); break;
-        case '4': commandSetDateAndTime('\0'); break;
-        case '5': commandSetFeederTime('\0');break;
-        case '6': commandShowFeederTime();break;
-        case '7': logRead();break;
-        case '8': commandLoadUid();break;
+        case 'q':case 'Q': commandShowCurrentFeederStatus(); break;
+        case 'w':case 'W': commandSetFeederStatus('\0'); break;
+        case 'e':case 'E': commandShowDateAndTime(); break;
+        case 'r':case 'R': commandSetDateAndTime('\0'); break;
+        case 't':case 'T': commandSetFeederTime('\0');break;
+        case 'y':case 'Y': commandShowFeederTime();break;
+        case 'u':case 'U': logRead();break;
+        case 'i': case 'I':commandLoadUid();break;
         case 'z': case 'x':case 'c':case 'Z':case 'X':case 'C': commandSetFeederDirection(receivedChar);break;
         
         default: availableCommands(); break;
@@ -199,14 +219,14 @@ void commandSetFeederDirection(char receivedChar){
 static void availableCommands(){
     pcSerialComStringWrite( "Available commands:\r\n" );
 
-    pcSerialComStringWrite( "Press '1' to get the feeder state\r\n" );
-    pcSerialComStringWrite( "Press '2' to set the feeder state\r\n" );
-    pcSerialComStringWrite( "Press '3' ShowDateAndTime\r\n" );
-    pcSerialComStringWrite( "Press '4' SetDateAndTime\r\n" );
-    pcSerialComStringWrite( "Press '5' SetFeederTime\r\n" );
-    pcSerialComStringWrite( "Press '6' GetFeederTime\r\n" );
-    pcSerialComStringWrite( "Press '7' ShowLog\r\n" );
-    pcSerialComStringWrite( "Press '8' Add Entry To Log\r\n" );
+    pcSerialComStringWrite( "Press 'q' to get the feeder state\r\n" );
+    pcSerialComStringWrite( "Press 'w' to set the feeder state\r\n" );
+    pcSerialComStringWrite( "Press 'e' ShowDateAndTime\r\n" );
+    pcSerialComStringWrite( "Press 'r' SetDateAndTime\r\n" );
+    pcSerialComStringWrite( "Press 't' SetFeederTime\r\n" );
+    pcSerialComStringWrite( "Press 'y' GetFeederTime\r\n" );
+    pcSerialComStringWrite( "Press 'u' ShowLog\r\n" );
+    pcSerialComStringWrite( "Press 'i' Add Entry To Log\r\n" );
     pcSerialComStringWrite( "Press 'Z','X','C' to move de motors (ONLY IN MANUAL MODE)\r\n" );
 
 
