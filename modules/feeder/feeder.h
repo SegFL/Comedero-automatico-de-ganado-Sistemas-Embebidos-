@@ -39,7 +39,7 @@ bool feederTimeSet( int year1, int month1, int day1,
 //Manual
 int feederManualModeRead();
 //Free
-//bool feederFreeModeInit(char* uid);
+
 
 
 

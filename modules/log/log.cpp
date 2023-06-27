@@ -70,11 +70,14 @@ void logWrite(const char* uid,int duracion){
  }
 
 bool logAdd(char*uid){
-
     if(!uid)
         return false;
     //printf("%s\n",uid);
-    
+   
+   if(logExist(uid)==true){
+       printf("\n The UID already exist");
+       return false;
+   }
     data_t* data_aux=(data_t*)calloc(1,sizeof(data_t));
     if(!data_aux)
         return false;
@@ -82,7 +85,7 @@ bool logAdd(char*uid){
         free(data_aux);
         return false;
     }
-    printf(" \nse copia : %s\n",data_aux->uid);
+    //printf(" \nse copia : %s\n",data_aux->uid);
     data_t** vector_aux=(data_t**)realloc(data_vector,sizeof(data_t*)*(cantidad+1));
     if(!vector_aux){
         free(data_aux->uid);

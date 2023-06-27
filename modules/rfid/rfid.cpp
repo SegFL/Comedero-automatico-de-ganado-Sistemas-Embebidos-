@@ -45,27 +45,29 @@ void rfidUpdate(){
             if ( ! RfChip.PICC_IsNewCardPresent()) 
 		        return;
             rfidStatus=RFID_READING_NEW_CARD;
-	        break;
-        }
+            delay(500);
+	        
+        }break;
         case RFID_READING_NEW_CARD:{
             // Select one of the cards
             if ( RfChip.PICC_ReadCardSerial()==false) {
                 return;
-	        }     
+	        } 
+            delay(500);    
             for (uint8_t i = 0; i < RfChip.uid.size; i++)
             {
                  sprintf(buffer+i*2,"%02X", RfChip.uid.uidByte[i]);
             } 
             rfidStatus=RFID_VALID_CARD;
+            delay(1000);
             break;
-        }
+        }break;
         case RFID_VALID_CARD:{
-
            // puts("tengo una uid valida");
             break;
         }
 
-        }
+    }
 
 }
 //Se supone que borran la memoria

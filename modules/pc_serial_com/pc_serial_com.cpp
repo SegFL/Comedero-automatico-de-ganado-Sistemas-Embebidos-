@@ -14,7 +14,7 @@
 
 //=====[Declaration of private defines]========================================
 
-#define INTERFAZ_BLE
+#define INTERFAZ_BLE_AND_PC
 //=====[Declaration of private data types]=====================================
 
 typedef enum{
@@ -95,7 +95,7 @@ void pcSerialComInit()
 {
     availableCommands();
 }
-
+//Lee un caracter de la pc o por BLE
 char pcSerialComCharRead()
 {
     char receivedChar = '\0';
@@ -107,13 +107,17 @@ char pcSerialComCharRead()
     }
     #endif
 
-    #ifdef INTERFAZ_BLE
-    
+    #ifdef INTERFAZ_BLE_AND_PC
 
-        receivedChar = bleComCharRead();
-    
-
+    if( uartUsb.readable() ) {
+        uartUsb.read( &receivedChar, 1 );
+    }
+    if(receivedChar=='\0'){
+            receivedChar = bleComCharRead(); 
+    }
     #endif
+
+    
     return receivedChar;
 }
 
@@ -125,9 +129,11 @@ void pcSerialComStringWrite( const char* str )
     uartUsb.write( str, strlen(str) );
     #endif
 
-    #ifdef INTERFAZ_BLE
+    #ifdef INTERFAZ_BLE_AND_PC
+
     bleComStringWrite(str);
     uartUsb.write( str, strlen(str) );
+
     #endif
 }
 

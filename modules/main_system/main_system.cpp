@@ -46,7 +46,8 @@ void mainSystemUpdate()
         rfidUpdate();
         nonBlockingDelayInit(&mainDelay,SYSTEM_TIME_INCREMENT_MS);
     }
-    bleComUpdate();
+    
+    //bleComUpdate();
 }
 
 //=====[Implementations of private functions]==================================
