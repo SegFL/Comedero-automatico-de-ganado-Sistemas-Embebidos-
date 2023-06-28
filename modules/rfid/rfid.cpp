@@ -42,25 +42,23 @@ void rfidUpdate(){
 
     switch(rfidStatus){
         case RFID_IDLE:{
-            if ( ! RfChip.PICC_IsNewCardPresent()) 
-		        return;
-            rfidStatus=RFID_READING_NEW_CARD;
-            delay(500);
-	        
+            if ( !RfChip.PICC_IsNewCardPresent()) 
+		        break;
+            rfidStatus=RFID_READING_NEW_CARD;    
         }break;
         case RFID_READING_NEW_CARD:{
             // Select one of the cards
-            if ( RfChip.PICC_ReadCardSerial()==false) {
-                return;
+            if ( !RfChip.PICC_ReadCardSerial()) {
+                break;
 	        } 
-            delay(500);    
+              
             for (uint8_t i = 0; i < RfChip.uid.size; i++)
             {
                  sprintf(buffer+i*2,"%02X", RfChip.uid.uidByte[i]);
             } 
             rfidStatus=RFID_VALID_CARD;
-            delay(1000);
-            break;
+            printf("%s\n",buffer);
+            
         }break;
         case RFID_VALID_CARD:{
            // puts("tengo una uid valida");
