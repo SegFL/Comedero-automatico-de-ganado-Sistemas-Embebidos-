@@ -1,10 +1,16 @@
 #include "mbed.h"
+#include "arm_book_lib.h"
 
-// main() runs in its own thread in the OS
+#include "main_system.h"
+
+
+
+
+
 int main()
 {
+    mainSystemInit();
     while (true) {
-
+        mainSystemUpdate();
     }
 }
-
