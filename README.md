@@ -8,13 +8,13 @@ El sistema pueda identificar y detectar a cada animal de forma que se pueda llev
 
 Utilizando distintos modos de funcionamiento se controlan una serie de motores, los cuales son los encargados de suministrar de alimento a los distintos animales.
 
-'Modo libre'
+###Modo libre
     En este modo no existira ningun tipo de control sobre la cantidad de alimento suministrada. Simplemente se llevara un registro de la cantidad de alimento suministrada a        cada animal.
 
-'Modo tiempo'
+###Modo tiempo
     El ususario podra ingresar el periodo de tiempo en el que el sistema este habilitado.  
 
-'Modo manual'
+###Modo manual
     El usuario podra utilizar una serie de botones para suministrar el alimento necesario.
     
 
