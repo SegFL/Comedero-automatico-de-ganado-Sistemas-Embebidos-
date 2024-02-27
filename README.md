@@ -1,42 +1,23 @@
-# Proyecto-Emebebidos
+# Proyecto de Sistemas Emebebidos
 
-DATOS:
-    Card UID: C7 45 85 01
-    Card SAK: 08
-    PICC type: MIFARE 1KB
+## Comedero automatico de ganado
 
-    Card UID: C7 45 85 01
-    Card SAK: 08
-    PICC type: MIFARE 1KB
+Este trabajo tiene como objetivo automatizar el proceso de un comedero de animales. 
 
-Ficha
-Card UID:  C302 F302 2002 9B02PICC Type: MIFARE 1KB 
-C3 F3 20 9B
-Tarjeta:
-Card UID:  C702 4502 8502 102PICC Type: MIFARE 1KB
-C7 45 85 01
+El sistema pueda identificar y detectar a cada animal de forma que se pueda llevar un registro de la cantidad de alimento suministrada. 
 
+Utilizando distintos modos de funcionamiento se controlan una serie de motores, los cuales son los encargados de suministrar de alimento a los distintos animales.
 
-TO DO:
+'Modo libre'
+    En este modo no existira ningun tipo de control sobre la cantidad de alimento suministrada. Simplemente se llevara un registro de la cantidad de alimento suministrada a        cada animal.
 
-En la funcion commandSetFeederTime(const char charReceived) la duracion en fija, falta implementar el parser para poner segundos minutos y horas
+'Modo tiempo'
+    El ususario podra ingresar el periodo de tiempo en el que el sistema este habilitado.  
 
-Deberia cambiar oara que feeder set feede status arranque en modo apagado(deberia gregar un nuevo modo el feeder)
-
-No deberia poder entrar a cambaiar el tiempo del feeder cuando no estoy en modo TIME MODE
-
-Implementar en feeder update como cambian los motores con cada modo y agregar a pcserial botones para controlar en modo manual los motores
-
-void feederTimeModeUpdate():
-    En la funcion al complir con el timepo de espera se setea de vuevlta el tiempo y se incrementa el dia en 1, que pasa si el dia es 31?Incrementa el mes?Se puede soluciona haciendo algo parecido al ejemplo 112 del libro
+'Modo manual'
+    El usuario podra utilizar una serie de botones para suministrar el alimento necesario.
+    
 
 
-Deberia cambianr los printf por pcSerialComStringWrite()
-
-
-Problemas de implementacion:
-    Tengo un solo lector RFID por lo que no puedo diferenciar que motor tengo que prender. O sea por una entrada en el mismo modulo RFID prendo 2 motores, no tendria mucho sentido.Que hago? No le doy bola y uso un solo modulo, controlo los 2 motores o saco 1?
-
-    Probelmas al abrir el archvio log, hay que configurar algo por fuera del programa?
-
+El sistema identifica a los animales utilizando una etiqueta RFID. Cuando los sensores detecten un identificador valido (previamente cargado al sistema) se activaran los motores en funcion del modo de funcionamiento.
 
