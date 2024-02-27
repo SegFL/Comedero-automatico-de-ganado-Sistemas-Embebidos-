@@ -22,3 +22,6 @@ Utilizando distintos modos de funcionamiento se controlan una serie de motores, 
 
 El sistema identifica a los animales utilizando una etiqueta RFID. Cuando los sensores detecten un identificador valido (previamente cargado al sistema) se activaran los motores en funcion del modo de funcionamiento.
 
+![image](https://github.com/SegFL/Proyecto-Emebebidos/assets/127962581/7dcb4981-e387-4987-ba53-836338075f94)
+
+
