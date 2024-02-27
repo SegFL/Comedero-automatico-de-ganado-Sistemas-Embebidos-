@@ -43,10 +43,9 @@ void mainSystemUpdate()
     if(nonBlockingDelayRead(&mainDelay)==true){
         feederUpdate();
         pcSerialComUpdate();
-        rfidUpdate();
         nonBlockingDelayInit(&mainDelay,SYSTEM_TIME_INCREMENT_MS);
     }
-    bleComUpdate();
+    rfidUpdate();
 }
 
 //=====[Implementations of private functions]==================================

@@ -26,10 +26,6 @@ class motor{
         void change_state(motorDirection_t state);
         motorDirection_t read();
         void write(motorDirection_t d);
-
-
-
-
  };
 
 

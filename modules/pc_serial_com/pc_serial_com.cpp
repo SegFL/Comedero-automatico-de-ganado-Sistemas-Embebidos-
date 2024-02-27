@@ -14,7 +14,7 @@
 
 //=====[Declaration of private defines]========================================
 
-#define INTERFAZ_BLE
+#define INTERFAZ_BLE_AND_PC
 //=====[Declaration of private data types]=====================================
 
 typedef enum{
@@ -95,25 +95,26 @@ void pcSerialComInit()
 {
     availableCommands();
 }
-
+//Lee un caracter de la pc o por BLE
 char pcSerialComCharRead()
 {
     char receivedChar = '\0';
 
     #ifdef INTERFAZ_PC
-
     if( uartUsb.readable() ) {
         uartUsb.read( &receivedChar, 1 );
     }
     #endif
 
-    #ifdef INTERFAZ_BLE
-    
-
-        receivedChar = bleComCharRead();
-    
-
+    #ifdef INTERFAZ_BLE_AND_PC
+    if( uartUsb.readable() ) {
+        uartUsb.read( &receivedChar, 1 );
+    }
+    if(receivedChar=='\0'){
+            receivedChar = bleComCharRead(); 
+    }
     #endif
+
     return receivedChar;
 }
 
@@ -125,9 +126,11 @@ void pcSerialComStringWrite( const char* str )
     uartUsb.write( str, strlen(str) );
     #endif
 
-    #ifdef INTERFAZ_BLE
+    #ifdef INTERFAZ_BLE_AND_PC
+
     bleComStringWrite(str);
     uartUsb.write( str, strlen(str) );
+
     #endif
 }
 
@@ -568,7 +571,7 @@ static void commandSetFeederTime(const char receivedChar){
                     commandShowFeederTime();
 	
                     date_and_time_status = SETTING_DESACTIVATE;
-		    pcSerialComMode=PC_SERIAL_COMMANDS;
+		            pcSerialComMode=PC_SERIAL_COMMANDS;
                 }    
 	    }break;
             case SETTING_DESACTIVATE: {

@@ -8,6 +8,8 @@
 #include "aux_functions.h"
 #include "feeder.h"
 
+#define _PROBANDO_LECTURA_RFID
+
 typedef enum{
     RFID_IDLE,
     RFID_READING_NEW_CARD,
@@ -30,6 +32,7 @@ DigitalOut LedRed(LED3);
 
 #endif
 
+
 void rfidInit(){
 
     tickInit();
@@ -42,40 +45,44 @@ void rfidUpdate(){
 
     switch(rfidStatus){
         case RFID_IDLE:{
-            if ( ! RfChip.PICC_IsNewCardPresent()) 
-		        return;
-            rfidStatus=RFID_READING_NEW_CARD;
-	        break;
-        }
+            if ( !RfChip.PICC_IsNewCardPresent()) 
+		        break;
+            rfidStatus=RFID_READING_NEW_CARD;    
+        }break;
         case RFID_READING_NEW_CARD:{
             // Select one of the cards
-            if ( RfChip.PICC_ReadCardSerial()==false) {
-                return;
-	        }     
+            if ( !RfChip.PICC_ReadCardSerial()) {
+                break;
+	        } 
+              
             for (uint8_t i = 0; i < RfChip.uid.size; i++)
             {
                  sprintf(buffer+i*2,"%02X", RfChip.uid.uidByte[i]);
             } 
             rfidStatus=RFID_VALID_CARD;
-            break;
-        }
+        }break;
         case RFID_VALID_CARD:{
-
-           // puts("tengo una uid valida");
+           // Tengo una uid valida
+           #ifdef _PROBANDO_LECTURA_RFID
+           char* aux=rfidGetUid();
+           if(aux)
+                printf("...UID:%s\n",aux);
+            #endif
             break;
         }
-
-        }
-
+    }
 }
 //Se supone que borran la memoria
 char* rfidGetUid(){
+    char* aux=NULL;
+
     if(rfidStatus!=RFID_VALID_CARD)
         return NULL;
 
-    char* aux=strndup(buffer,10);
+    aux=strndup(buffer,10);
     buffer[0]={'\0'};
     rfidStatus=RFID_IDLE;//Ya procese el uid ingresado a si que vuelvo a modo de esepra
+    
     return aux;
 
 }

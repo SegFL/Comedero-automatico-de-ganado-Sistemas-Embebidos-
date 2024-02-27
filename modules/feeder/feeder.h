@@ -7,9 +7,9 @@
 //=====[Declaration of public defines]=========================================
 
 #define MOTOR1_PIN1 PF_12
-#define MOTOR1_PIN2 PF_13
+#define MOTOR1_PIN2 PF_13   //Sin conexion
 
-#define MOTOR2_PIN1 PF_14
+#define MOTOR2_PIN1 PF_14   //No utilizados
 #define MOTOR2_PIN2 PF_15
 
 //=====[Declaration of public data types]======================================
@@ -39,7 +39,7 @@ bool feederTimeSet( int year1, int month1, int day1,
 //Manual
 int feederManualModeRead();
 //Free
-//bool feederFreeModeInit(char* uid);
+
 
 
 

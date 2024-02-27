@@ -81,7 +81,7 @@ static feederStatus_t previousState;
 
 
 
-
+static bool feederFreeModeInit(char* uid);
 static void feederTimeModeUpdate();
 static void feederFreeModeUpdate();
 static void feederManualModeUpdate();
@@ -98,42 +98,46 @@ void feederInit(){
 }
 void feederUpdate() {
 
+    char* uid=NULL;
+
     switch(feederStatus){
         case FEEDER_MANUAL_MODE:{
             feederManualModeUpdate();
         }break;
         case FEEDER_FREE_MODE:{
+            uid=rfidGetUid();
+            if(uid)
+                feederFreeModeInit(uid);
             feederFreeModeUpdate();
+            free(uid);
+            uid=NULL;
         }break;
         case FEEDER_TIME_MODE:{
             if(feederTimeStateSet==false)  //Si no estan un tiempo no hago nada
                 break;
             feederTimeModeUpdate();
-        }
+        }break;
         case FEEDER_NEW_UID:{
-            //if(logAdd(rfidGetUid())==true){
-            char* uid=rfidGetUid();
+            uid=rfidGetUid();
             if(uid){
-                //printf("En el feeder llega :%s\n",uid);
-                if(logAdd(uid)==true){
+                if(logExist(uid)==true){
+                    printf("This UID already exist :%s\n",uid);
+                }else if(logAdd(uid)==true){
                     printf("New tag introduced:%s\n",uid);
-                    free(uid);
-                    feederStatus=previousState;
-                }
-                    
+                   
+                }else{printf("Error introducing :%s\n",uid);}
             }
-
-            break;   
-        }
+            free(uid);
+            feederStatus=FEEDER_MANUAL_MODE;
+        }break;   
         default:{break;}
     }
     //Me fijo si tengo que cambiar el estado a FEEDER_NEW_UID
     if( pcSerialComStateNewUid()==true){
-    //Podria implementar un delay para que salga autoamticamente desp de x tiempo
-     //previousState=feederStatus;
-    feederStatus=FEEDER_NEW_UID;
+        previousState=feederStatus;
+        feederStatus=FEEDER_NEW_UID;
     }
-
+//Actualizo los motores al estado que corresponda
     for (int i = 0; i < 2; i++) {
       switch (motorArray[i].read_state()) {
         case DIRECTION_1:
@@ -141,19 +145,15 @@ void feederUpdate() {
                 motorArray[i].change_state(STOPPED);
             }
             break;
-
         case DIRECTION_2:
             if (motorArray[i].read() != DIRECTION_2) {
                  motorArray[i].change_state(STOPPED);
             }
             break;
-
         case STOPPED:
         default:
             if (motorArray[i].read() == DIRECTION_1) {
                 motorArray[i].change_state(DIRECTION_1);
-                
-
             }else if (motorArray[i].read() == DIRECTION_2) {
                 motorArray[i].change_state(DIRECTION_2);
             }
@@ -374,31 +374,22 @@ void feederFreeModeUpdate(){
 bool feederFreeModeInit(char* uid){
     if(!uid)
         return false;
-    if(feederStatus!=FEEDER_FREE_MODE){//si no estoy en free mode elimino el string y no hago nada
-        free(uid);
+    if(feederStatus!=FEEDER_FREE_MODE){
+        return false;
+    }
+    if(logExist(uid)!=true){
         return false;
     }
 
-    
-    printf("%s\n",uid);
+    //Me fijo si tengo que prender el motor
 
-    if(logExist(uid)==true){
-
-        //Me fijo si tengo que prender el motor
-
-        for (int i = 0; i < 2; i++) {
-            motorArray[i].write(DIRECTION_1);
+    for (int i = 0; i < 2; i++) {
+         motorArray[i].write(DIRECTION_1);
             //Escribo en que momento se encendio el motor y con que uid
-            motorInfoInit(&motor_info[i],uid);
-        }
-        nonBlockingDelayInit(&freeModeDelay,1000);
-        free(uid);
-        return true;
-
+        motorInfoInit(&motor_info[i],uid);
     }
-    free(uid);
-    return false;
-    
+    nonBlockingDelayInit(&freeModeDelay,4000);
+    return true;  
 }
 
  void motorInfoInit(motor_info_t* d,const char*uid){

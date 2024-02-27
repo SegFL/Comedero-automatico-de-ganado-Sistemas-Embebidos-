@@ -43,34 +43,6 @@ UnbufferedSerial uartBle(PD_5, PD_6, 9600);
 
 void bleComUpdate()
 {
-    static int g=0;
-    char buff[]={'\0'};
-/*    char receivedChar = bleComCharRead();
-    if( receivedChar != '\0' ) {
-
-
-            switch(receivedChar){
-                case 'a':case 'A':case 1:{
-                    bleComStringWrite(buff);
-                    z1.write(ON);
-                    break;
-                }
-                case 'b':case 'B':case 2:{
-                    bleComStringWrite(buff);
-                    z2.write(ON);
-                    break;
-                }
-                case 'c': case 'C':{
-                    bleComStringWrite(buff);
-                    z1.write(OFF);
-                    z2.write(OFF);
-                    z3.write(OFF);
-                    break;
-                  }      
-        
-
-        }
-    }*/
 }
 
 void bleComStringWrite( const char* str )
